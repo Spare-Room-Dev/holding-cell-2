@@ -1,0 +1,14 @@
+{
+  "name": "holding-cell",
+  "version": "0.1.0",
+  "private": true,
+  "workspaces": ["frontend"],
+  "scripts": {
+    "dev:backend": "cd backend && uvicorn main:combined_app --reload --port 8000",
+    "dev:frontend": "cd frontend && npm run dev",
+    "dev:all": "concurrently -n \"backend,frontend\" -c \"bgBlue.bold,green.bold\" \"npm run dev:backend\" \"npm run dev:frontend\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
