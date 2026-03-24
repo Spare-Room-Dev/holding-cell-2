@@ -1,7 +1,7 @@
-@import "tailwindcss";
-
 /* Satoshi font from Fontshare CDN (not on Google Fonts) */
 @import url('https://api.fontshare.com/v2/css?f[]=satoshi@900,700&display=swap');
+
+@import "tailwindcss";
 
 /* ============================================
    DESIGN SYSTEM TOKENS - The Holding Cell
