@@ -7,15 +7,15 @@
 
 ### Backend Core
 
-- [ ] **BACK-01**: FastAPI server runs on port 8000 with async support
-- [ ] **BACK-02**: python-socketio AsyncServer handles WebSocket connections with `await sio.emit()` (not sync emit)
-- [ ] **BACK-03**: AttackGenerator produces fake attack events every 3-8 seconds (randomized)
-- [ ] **BACK-04**: FakeGenerator uses weighted archetype distribution (botnet_drone: 50%, script_kiddie: 30%, apt_operative: 10%, iot_worm: 7%, hacktivist: 3%)
-- [ ] **BACK-05**: AttackEvent includes: id, timestamp, ip, country, countryCode, port, protocol, archetype, commands, duration, rawLog
-- [ ] **BACK-06**: Fake IPs drawn from TEST-NET ranges (203.0.113.x, 198.51.100.x, 192.0.2.x)
-- [ ] **BACK-07**: Countries weighted toward realistic attacker origins (Russia, China, Brazil, Iran, etc.)
-- [ ] **BACK-08**: Archetype classifier assigns duration + commands based on fingerprint rules (script_kiddie <2min/<10cmds, apt_operative >10min/>50cmds with recon, etc.)
-- [ ] **BACK-09**: Socket emit failures logged with try/catch, no crash, no silent data loss
+- [x] **BACK-01**: FastAPI server runs on port 8000 with async support
+- [x] **BACK-02**: python-socketio AsyncServer handles WebSocket connections with `await sio.emit()` (not sync emit)
+- [x] **BACK-03**: AttackGenerator produces fake attack events every 3-8 seconds (randomized)
+- [x] **BACK-04**: FakeGenerator uses weighted archetype distribution (botnet_drone: 50%, script_kiddie: 30%, apt_operative: 10%, iot_worm: 7%, hacktivist: 3%)
+- [x] **BACK-05**: AttackEvent includes: id, timestamp, ip, country, countryCode, port, protocol, archetype, commands, duration, rawLog
+- [x] **BACK-06**: Fake IPs drawn from TEST-NET ranges (203.0.113.x, 198.51.100.x, 192.0.2.x)
+- [x] **BACK-07**: Countries weighted toward realistic attacker origins (Russia, China, Brazil, Iran, etc.)
+- [x] **BACK-08**: Archetype classifier assigns duration + commands based on fingerprint rules (script_kiddie <2min/<10cmds, apt_operative >10min/>50cmds with recon, etc.)
+- [x] **BACK-09**: Socket emit failures logged with try/catch, no crash, no silent data loss
 
 ### Real-Time Connection
 
@@ -70,7 +70,7 @@
 - [ ] **DEV-01**: `npm run dev:backend` starts FastAPI on port 8000
 - [ ] **DEV-02**: `npm run dev:frontend` starts Next.js on port 3000
 - [ ] **DEV-03**: `npm run dev:all` runs both concurrently
-- [ ] **DEV-04**: backend/requirements.txt lists all Python dependencies
+- [x] **DEV-04**: backend/requirements.txt lists all Python dependencies
 - [ ] **DEV-05**: frontend/package.json lists all Node dependencies
 
 ## v2 Requirements
@@ -110,20 +110,56 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BACK-01 through BACK-09 | Phase 1 | Pending |
-| RTCL-01 through RTCL-05 | Phase 1 | Pending |
-| CELL-01 through CELL-06 | Phase 2 | Pending |
-| PRSN-01 through PRSN-06 | Phase 3 | Pending |
-| TOOL-01 through TOOL-03 | Phase 3 | Pending |
-| STAT-01 through STAT-04 | Phase 2 | Pending |
-| FE-01 through FE-06 | Phase 1 | Pending |
-| DEV-01 through DEV-05 | Phase 1 | Pending |
+| BACK-01 | Phase 1 | Complete |
+| BACK-02 | Phase 1 | Complete |
+| BACK-03 | Phase 1 | Complete |
+| BACK-04 | Phase 1 | Complete |
+| BACK-05 | Phase 1 | Complete |
+| BACK-06 | Phase 1 | Complete |
+| BACK-07 | Phase 1 | Complete |
+| BACK-08 | Phase 1 | Complete |
+| BACK-09 | Phase 1 | Complete |
+| RTCL-01 | Phase 1 | Pending |
+| RTCL-02 | Phase 1 | Pending |
+| RTCL-03 | Phase 1 | Pending |
+| RTCL-04 | Phase 1 | Pending |
+| RTCL-05 | Phase 1 | Pending |
+| CELL-01 | Phase 2 | Pending |
+| CELL-02 | Phase 2 | Pending |
+| CELL-03 | Phase 2 | Pending |
+| CELL-04 | Phase 2 | Pending |
+| CELL-05 | Phase 2 | Pending |
+| CELL-06 | Phase 2 | Pending |
+| PRSN-01 | Phase 3 | Pending |
+| PRSN-02 | Phase 3 | Pending |
+| PRSN-03 | Phase 3 | Pending |
+| PRSN-04 | Phase 3 | Pending |
+| PRSN-05 | Phase 3 | Pending |
+| PRSN-06 | Phase 3 | Pending |
+| TOOL-01 | Phase 3 | Pending |
+| TOOL-02 | Phase 3 | Pending |
+| TOOL-03 | Phase 3 | Pending |
+| STAT-01 | Phase 2 | Pending |
+| STAT-02 | Phase 2 | Pending |
+| STAT-03 | Phase 2 | Pending |
+| STAT-04 | Phase 2 | Pending |
+| FE-01 | Phase 1 | Pending |
+| FE-02 | Phase 1 | Pending |
+| FE-03 | Phase 1 | Pending |
+| FE-04 | Phase 1 | Pending |
+| FE-05 | Phase 1 | Pending |
+| FE-06 | Phase 1 | Pending |
+| DEV-01 | Phase 1 | Pending |
+| DEV-02 | Phase 1 | Pending |
+| DEV-03 | Phase 1 | Pending |
+| DEV-04 | Phase 1 | Complete |
+| DEV-05 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 27 total
-- Mapped to phases: 27
+- v1 requirements: 38 total
+- Mapped to phases: 38
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-24*
-*Last updated: 2026-03-24 after initial definition*
+*Last updated: 2026-03-24 after roadmap creation*
