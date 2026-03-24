@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import { SocketProvider } from '@/context/SocketContext';
 
 /**
  * Font configuration per DESIGN.md:
@@ -37,7 +38,9 @@ export default function RootLayout({
       className={`dark ${dmSans.variable} ${ibmPlexMono.variable}`}
     >
       <body className="min-h-screen bg-background text-text-primary font-body antialiased">
-        {children}
+        <SocketProvider>
+          {children}
+        </SocketProvider>
       </body>
     </html>
   );
