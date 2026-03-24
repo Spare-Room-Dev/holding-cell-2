@@ -3,6 +3,20 @@
 
 import { ConnectionStatus } from '@/components/ConnectionStatus';
 import { useSocket } from '@/context/SocketContext';
+import { Archetype } from '@/types/attack';
+
+// Per D-09: Archetype colors matching backend
+const ARCHETYPE_COLORS: Record<Archetype, string> = {
+  script_kiddie: 'text-amber',      // Yellow/Amber
+  botnet_drone: 'text-phosphor',   // Green
+  apt_operative: 'text-alert',     // Red
+  iot_worm: 'text-purple-400',     // Magenta
+  hacktivist: 'text-blue-400',     // Blue
+};
+
+function getArchetypeColor(archetype: Archetype): string {
+  return ARCHETYPE_COLORS[archetype] || 'text-phosphor';
+}
 
 export default function Dashboard() {
   const { state } = useSocket();
@@ -40,7 +54,7 @@ export default function Dashboard() {
               </p>
               <ul className="font-mono text-sm space-y-xs">
                 {state.attacks.slice(0, 5).map((attack) => (
-                  <li key={attack.id} className="text-phosphor">
+                  <li key={attack.id} className={getArchetypeColor(attack.archetype)}>
                     [{attack.archetype}] {attack.ip} — {attack.country}
                   </li>
                 ))}
