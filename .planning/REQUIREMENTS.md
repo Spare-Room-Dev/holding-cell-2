@@ -19,11 +19,11 @@
 
 ### Real-Time Connection
 
-- [ ] **RTCL-01**: Socket.io client connects to ws://localhost:8000 on page load
-- [ ] **RTCL-02**: Client auto-reconnects with exponential backoff (1s, 2s, 4s, max 30s) on disconnect
-- [ ] **RTCL-03**: "SIGNAL LOST" banner displayed on dashboard during disconnect
-- [ ] **RTCL-04**: Connection state displayed via "LIVE" badge with phosphor green glow pulse
-- [ ] **RTCL-05**: Events emitted during disconnect are lost (acceptable for Approach A v1)
+- [x] **RTCL-01**: Socket.io client connects to ws://localhost:8000 on page load
+- [x] **RTCL-02**: Client auto-reconnects with exponential backoff (1s, 2s, 4s, max 30s) on disconnect
+- [x] **RTCL-03**: "SIGNAL LOST" banner displayed on dashboard during disconnect
+- [x] **RTCL-04**: Connection state displayed via "LIVE" badge with phosphor green glow pulse
+- [x] **RTCL-05**: Events emitted during disconnect are lost (acceptable for Approach A v1)
 
 ### Jail Cell Visualization
 
@@ -119,11 +119,11 @@
 | BACK-07 | Phase 1 | Complete |
 | BACK-08 | Phase 1 | Complete |
 | BACK-09 | Phase 1 | Complete |
-| RTCL-01 | Phase 1 | Pending |
-| RTCL-02 | Phase 1 | Pending |
-| RTCL-03 | Phase 1 | Pending |
-| RTCL-04 | Phase 1 | Pending |
-| RTCL-05 | Phase 1 | Pending |
+| RTCL-01 | Phase 1 | Complete |
+| RTCL-02 | Phase 1 | Complete |
+| RTCL-03 | Phase 1 | Complete |
+| RTCL-04 | Phase 1 | Complete |
+| RTCL-05 | Phase 1 | Complete |
 | CELL-01 | Phase 2 | Pending |
 | CELL-02 | Phase 2 | Pending |
 | CELL-03 | Phase 2 | Pending |
