@@ -58,12 +58,12 @@
 
 ### Frontend Stack
 
-- [ ] **FE-01**: Next.js 14 App Router, TypeScript, Tailwind CSS
-- [ ] **FE-02**: Framer Motion 11.x for animations
-- [ ] **FE-03**: Socket.io Client 4.x
-- [ ] **FE-04**: Design tokens from DESIGN.md (colors, typography, spacing)
-- [ ] **FE-05**: Dark mode primary, light mode toggle available
-- [ ] **FE-06**: IBM Plex Mono for IPs, timestamps, attack types (tabular-nums)
+- [x] **FE-01**: Next.js 14 App Router, TypeScript, Tailwind CSS
+- [x] **FE-02**: Framer Motion 11.x for animations
+- [x] **FE-03**: Socket.io Client 4.x
+- [x] **FE-04**: Design tokens from DESIGN.md (colors, typography, spacing)
+- [x] **FE-05**: Dark mode primary, light mode toggle available
+- [x] **FE-06**: IBM Plex Mono for IPs, timestamps, attack types (tabular-nums)
 
 ### Dev Experience
 
@@ -71,7 +71,7 @@
 - [ ] **DEV-02**: `npm run dev:frontend` starts Next.js on port 3000
 - [ ] **DEV-03**: `npm run dev:all` runs both concurrently
 - [x] **DEV-04**: backend/requirements.txt lists all Python dependencies
-- [ ] **DEV-05**: frontend/package.json lists all Node dependencies
+- [x] **DEV-05**: frontend/package.json lists all Node dependencies
 
 ## v2 Requirements
 
@@ -143,17 +143,17 @@
 | STAT-02 | Phase 2 | Pending |
 | STAT-03 | Phase 2 | Pending |
 | STAT-04 | Phase 2 | Pending |
-| FE-01 | Phase 1 | Pending |
-| FE-02 | Phase 1 | Pending |
-| FE-03 | Phase 1 | Pending |
-| FE-04 | Phase 1 | Pending |
-| FE-05 | Phase 1 | Pending |
-| FE-06 | Phase 1 | Pending |
+| FE-01 | Phase 1 | Complete |
+| FE-02 | Phase 1 | Complete |
+| FE-03 | Phase 1 | Complete |
+| FE-04 | Phase 1 | Complete |
+| FE-05 | Phase 1 | Complete |
+| FE-06 | Phase 1 | Complete |
 | DEV-01 | Phase 1 | Pending |
 | DEV-02 | Phase 1 | Pending |
 | DEV-03 | Phase 1 | Pending |
 | DEV-04 | Phase 1 | Complete |
-| DEV-05 | Phase 1 | Pending |
+| DEV-05 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 38 total

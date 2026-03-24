@@ -27,7 +27,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 
 Plans:
 - [x] 01-01-PLAN.md — Backend server + attack generator (BACK-01 to BACK-09, DEV-04)
-- [ ] 01-02-PLAN.md — Frontend scaffolding + design tokens (FE-01 to FE-06, DEV-05)
+- [x] 01-02-PLAN.md — Frontend scaffolding + design tokens (FE-01 to FE-06, DEV-05)
 - [ ] 01-03-PLAN.md — Socket.io client + Context + Connection UI (RTCL-01 to RTCL-05)
 - [ ] 01-04-PLAN.md — Root dev scripts + integration (DEV-01 to DEV-03)
 
