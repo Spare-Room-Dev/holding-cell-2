@@ -67,9 +67,9 @@
 
 ### Dev Experience
 
-- [ ] **DEV-01**: `npm run dev:backend` starts FastAPI on port 8000
-- [ ] **DEV-02**: `npm run dev:frontend` starts Next.js on port 3000
-- [ ] **DEV-03**: `npm run dev:all` runs both concurrently
+- [x] **DEV-01**: `npm run dev:backend` starts FastAPI on port 8000
+- [x] **DEV-02**: `npm run dev:frontend` starts Next.js on port 3000
+- [x] **DEV-03**: `npm run dev:all` runs both concurrently
 - [x] **DEV-04**: backend/requirements.txt lists all Python dependencies
 - [x] **DEV-05**: frontend/package.json lists all Node dependencies
 
@@ -149,9 +149,9 @@
 | FE-04 | Phase 1 | Complete |
 | FE-05 | Phase 1 | Complete |
 | FE-06 | Phase 1 | Complete |
-| DEV-01 | Phase 1 | Pending |
-| DEV-02 | Phase 1 | Pending |
-| DEV-03 | Phase 1 | Pending |
+| DEV-01 | Phase 1 | Complete |
+| DEV-02 | Phase 1 | Complete |
+| DEV-03 | Phase 1 | Complete |
 | DEV-04 | Phase 1 | Complete |
 | DEV-05 | Phase 1 | Complete |
 
