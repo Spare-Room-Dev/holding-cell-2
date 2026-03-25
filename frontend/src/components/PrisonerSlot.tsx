@@ -1,46 +1,73 @@
 // frontend/src/components/PrisonerSlot.tsx
 /**
- * PrisonerSlot - Archetype-colored prisoner placeholder
- * Phase 2: Core Visualization
+ * PrisonerSlot - Animated prisoner slot with hover tooltip
+ * Phase 3: Animated Prisoners
  *
- * Renders a 56px square box colored by attacker archetype.
- * This is a placeholder for Phase 3 pixel-art sprites.
- * Per D-10: Archetype-colored boxes as placeholder sprites.
- * Per D-12: No hover tooltip in Phase 2.
+ * Renders pixel-art prisoner sprites with spring entrance animation.
+ * Per D-17: New prisoners enter from above with spring physics.
+ * Per D-16: 150ms hover delay before tooltip shows.
+ * Per TOOL-02/TOOL-03: Tooltip shows after hover delay, dismisses immediately on mouse leave.
  */
 
-import type { AttackEvent, Archetype } from '@/types/attack';
+'use client';
 
-// Archetype color mapping (per D-11: use existing ARCHETYPE_COLORS pattern)
-const ARCHETYPE_COLORS: Record<Archetype, string> = {
-  script_kiddie: 'amber',
-  botnet_drone: 'phosphor',
-  apt_operative: 'alert',
-  iot_worm: 'purple-400',
-  hacktivist: 'blue-400',
-};
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import type { AttackEvent } from '@/types/attack';
+import { PrisonerSprite } from './PrisonerSprite';
+import { ArrestRecordTooltip } from './ArrestRecordTooltip';
 
 interface PrisonerSlotProps {
   attack: AttackEvent;
+  isNew?: boolean; // true for newly added prisoners - triggers entrance animation
 }
 
-export function PrisonerSlot({ attack }: PrisonerSlotProps) {
-  const colorKey = ARCHETYPE_COLORS[attack.archetype];
+export function PrisonerSlot({ attack, isNew = false }: PrisonerSlotProps) {
+  // Hover state management for tooltip (per D-16: 150ms delay)
+  const [isHovered, setIsHovered] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
+
+  // 150ms hover delay before showing tooltip
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+    if (isHovered) {
+      timeoutId = setTimeout(() => setShowTooltip(true), 150);
+    }
+    return () => clearTimeout(timeoutId);
+  }, [isHovered]);
 
   return (
-    <div
-      className={`
-        w-14 h-14
-        bg-${colorKey}/20
-        border-2 border-${colorKey}
-        rounded-md
-        flex items-center justify-center
-      `}
+    <motion.div
+      layout
+      className="relative"
+      initial={isNew ? { y: -100, opacity: 0 } : false}
+      animate={{ y: 0, opacity: 1 }}
+      transition={
+        isNew
+          ? { type: 'spring', stiffness: 300, damping: 20 }
+          : { type: 'spring', stiffness: 400, damping: 25 }
+      }
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => {
+        setIsHovered(false);
+        setShowTooltip(false);
+      }}
     >
-      {/* Phase 2: Placeholder - archetype initial */}
-      <span className={`text-${colorKey} font-mono text-sm font-bold`}>
-        {attack.archetype.charAt(0).toUpperCase()}
-      </span>
-    </div>
+      <PrisonerSprite archetype={attack.archetype} />
+
+      {/* Tooltip with entrance/exit animation */}
+      <AnimatePresence>
+        {showTooltip && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.15 }}
+          >
+            <ArrestRecordTooltip attack={attack} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }
