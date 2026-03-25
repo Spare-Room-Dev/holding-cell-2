@@ -36,6 +36,9 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 | Remove Shodan radar | Not core to app's value | Deferred to Weekend 3 |
 | Prisoner entrance animation | Core wow moment — Framer Motion physics with spring | Key differentiator |
 | 20-prisoner cell cap | Older ones fade out gracefully | Defined |
+| Pixel-art sprites as inline SVG | No external image dependencies, archetype colors via bandana | Implemented Phase 03 |
+| Spring physics entrance (300/20) | Bounce physics for new prisoner "wow moment" | Implemented Phase 03 |
+| Stiffer shift spring (400/25) | Avoids bounce chaos when grid reflows | Implemented Phase 03 |
 
 ## Design Direction
 
@@ -48,12 +51,17 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 
 ### Active
 
-- [ ] Backend: FastAPI + Socket.io server with fake attack generator
-- [ ] Frontend: Next.js dashboard with JailCellGrid, Prisoner avatars, StatsPanel
-- [ ] Real-time: Socket.io connection with auto-reconnect
-- [ ] Visual: Pixel-art prisoner sprites with Framer Motion entrance animation
-- [ ] Visual: Dark retro-futuristic aesthetic with stone texture cell + iron bars
-- [ ] Data: Fake attack generation with realistic country/IP weights and archetype fingerprints
+- [ ] (Weekend 2+) Real Cowrie honeypot integration
+- [ ] (Weekend 2+) VPS deployment
+
+### Validated
+
+- [x] Backend: FastAPI + Socket.io server with fake attack generator — Validated in Phase 01
+- [x] Frontend: Next.js dashboard with JailCellGrid, Prisoner avatars, StatsPanel — Validated in Phase 01-02
+- [x] Real-time: Socket.io connection with auto-reconnect — Validated in Phase 01
+- [x] Visual: Pixel-art prisoner sprites with Framer Motion entrance animation — Validated in Phase 03
+- [x] Visual: Dark retro-futuristic aesthetic with stone texture cell + iron bars — Validated in Phase 02
+- [x] Data: Fake attack generation with realistic country/IP weights and archetype fingerprints — Validated in Phase 01
 
 ## Out of Scope
 
@@ -82,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-24 after initialization*
+*Last updated: 2026-03-25 after Phase 03 completion*
