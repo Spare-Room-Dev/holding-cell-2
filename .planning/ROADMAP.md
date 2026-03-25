@@ -78,7 +78,7 @@ Plans:
 **Plans**: 3 plans in 3 waves
 
 Plans:
-- [ ] 04-01-PLAN.md — Light mode CSS + ThemeToggle component
+- [x] 04-01-PLAN.md — Light mode CSS + ThemeToggle component
 - [ ] 04-02-PLAN.md — BottomSheet + responsive layout
 - [ ] 04-03-PLAN.md — Manual verification checkpoint
 
@@ -89,7 +89,7 @@ Plans:
 | 1. Foundation | 4/4 | Complete | 2026-03-24 |
 | 2. Core Visualization | 3/3 | Complete | 2026-03-25 |
 | 3. Animated Prisoners | 2/2 | Complete | 2026-03-25 |
-| 4. Polish | 0/3 | Not started | - |
+| 4. Polish | 0/3 | Planned    |  |
 
 ---
 
