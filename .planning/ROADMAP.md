@@ -75,7 +75,12 @@ Plans:
   2. All 5 archetype classifications work correctly based on fingerprint rules (script_kiddie <2min/<10cmds, botnet_drone repeated passwords, apt_operative >10min/>50cmds with recon, iot_worm buildroot/busybox/mips, hacktivist anonymous/free/hack in username)
   3. Dark mode primary active by default; light mode toggle functional
   4. Numbers format with locale commas; display caps at 99,999+
-**Plans**: TBD
+**Plans**: 3 plans in 3 waves
+
+Plans:
+- [ ] 04-01-PLAN.md — Light mode CSS + ThemeToggle component
+- [ ] 04-02-PLAN.md — BottomSheet + responsive layout
+- [ ] 04-03-PLAN.md — Manual verification checkpoint
 
 ## Progress
 
@@ -84,7 +89,7 @@ Plans:
 | 1. Foundation | 4/4 | Complete | 2026-03-24 |
 | 2. Core Visualization | 3/3 | Complete | 2026-03-25 |
 | 3. Animated Prisoners | 2/2 | Complete | 2026-03-25 |
-| 4. Polish | 0/0 | Not started | - |
+| 4. Polish | 0/3 | Not started | - |
 
 ---
 
@@ -94,3 +99,4 @@ Plans:
 *Plans defined: 2026-03-24*
 *Phase 2 plans created: 2026-03-25*
 *Phase 3 plans created: 2026-03-25*
+*Phase 4 plans created: 2026-03-25*
