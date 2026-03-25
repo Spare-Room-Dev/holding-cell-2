@@ -39,6 +39,37 @@
   color-scheme: dark;
 }
 
+/* Light mode theme (activated via .light class on <html>) */
+:root.light {
+  /* Background and surfaces */
+  --color-background: #F5F4F0;
+  --color-surface: #FFFFFF;
+  --color-surface-raised: #FAFAFA;
+
+  /* Borders */
+  --color-border: #E0DDD5;
+  --color-border-subtle: #ECEAE5;
+
+  /* Primary accent - Phosphor Green (desaturated 15% for light mode) */
+  --color-phosphor: #00DB75;
+  --color-phosphor-dim: #00B05A;
+  --color-phosphor-glow: rgba(0, 219, 117, 0.15);
+
+  /* Secondary accent - Amber (muted for light mode) */
+  --color-amber: #E5A600;
+
+  /* Alert/danger (muted for light mode) */
+  --color-alert: #E53550;
+
+  /* Text colors */
+  --color-text-primary: #1A1A1A;
+  --color-text-muted: #6B6B6B;
+  --color-text-subtle: #999999;
+
+  /* Light mode */
+  color-scheme: light;
+}
+
 /* Tailwind v4 theme configuration */
 @theme inline {
   /* Colors */
@@ -124,6 +155,10 @@
 
 /* Dark mode is primary - always apply dark styles */
 html {
+  color-scheme: dark;
+}
+
+html.dark {
   color-scheme: dark;
 }
 
