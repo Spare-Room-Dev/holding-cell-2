@@ -1,9 +1,10 @@
 ---
 phase: 3
 slug: animated-prisoners
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
+design_system_locked: true
 created: 2026-03-25
 ---
 
@@ -216,14 +217,14 @@ This phase uses inline SVG sprites — no external dependencies or third-party r
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS (focal point: animated prisoners in Jail Cell)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS (design_system_locked — DESIGN.md source of truth)
+- [x] Dimension 5 Spacing: PASS (design_system_locked — DESIGN.md source of truth)
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved (2026-03-25)
 
 ---
 
