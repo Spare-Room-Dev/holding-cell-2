@@ -18,7 +18,7 @@
 
 'use client';
 
-import { motion, AnimatePresence } from 'motion/react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/context/SocketContext';
 import { PrisonerSlot } from './PrisonerSlot';
 
