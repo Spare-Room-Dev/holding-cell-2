@@ -27,12 +27,12 @@
 
 ### Jail Cell Visualization
 
-- [ ] **CELL-01**: JailCellGrid renders dark stone/brick CSS texture background
-- [ ] **CELL-02**: Iron bar SVG/CSS overlay covers the cell
-- [ ] **CELL-03**: Prisoners stack vertically from bottom, newest on top
-- [ ] **CELL-04**: Cell capacity: last 20 prisoners displayed
-- [ ] **CELL-05**: Prisoners older than 20 fade out gracefully (opacity transition)
-- [ ] **CELL-06**: Empty state: "The cell is empty. Waiting for attackers..." in pixel font style
+- [x] **CELL-01**: JailCellGrid renders dark stone/brick CSS texture background
+- [x] **CELL-02**: Iron bar SVG/CSS overlay covers the cell
+- [x] **CELL-03**: Prisoners stack vertically from bottom, newest on top
+- [x] **CELL-04**: Cell capacity: last 20 prisoners displayed
+- [x] **CELL-05**: Prisoners older than 20 fade out gracefully (opacity transition)
+- [x] **CELL-06**: Empty state: "The cell is empty. Waiting for attackers..." in pixel font style
 
 ### Prisoner Avatars
 
@@ -51,10 +51,10 @@
 
 ### Stats Panel
 
-- [ ] **STAT-01**: Displays: Total Attacks, Script Kiddies, APT Operatives, Botnet Drones, IoT Worms, Hacktivists
-- [ ] **STAT-02**: Retro LED counter aesthetic
-- [ ] **STAT-03**: Counters increment on each `attack_event` received
-- [ ] **STAT-04**: Numbers format with locale commas; cap display at 99,999+
+- [x] **STAT-01**: Displays: Total Attacks, Script Kiddies, APT Operatives, Botnet Drones, IoT Worms, Hacktivists
+- [x] **STAT-02**: Retro LED counter aesthetic
+- [x] **STAT-03**: Counters increment on each `attack_event` received
+- [x] **STAT-04**: Numbers format with locale commas; cap display at 99,999+
 
 ### Frontend Stack
 
@@ -124,12 +124,12 @@
 | RTCL-03 | Phase 1 | Complete |
 | RTCL-04 | Phase 1 | Complete |
 | RTCL-05 | Phase 1 | Complete |
-| CELL-01 | Phase 2 | Pending |
-| CELL-02 | Phase 2 | Pending |
-| CELL-03 | Phase 2 | Pending |
-| CELL-04 | Phase 2 | Pending |
-| CELL-05 | Phase 2 | Pending |
-| CELL-06 | Phase 2 | Pending |
+| CELL-01 | Phase 2 | Complete |
+| CELL-02 | Phase 2 | Complete |
+| CELL-03 | Phase 2 | Complete |
+| CELL-04 | Phase 2 | Complete |
+| CELL-05 | Phase 2 | Complete |
+| CELL-06 | Phase 2 | Complete |
 | PRSN-01 | Phase 3 | Pending |
 | PRSN-02 | Phase 3 | Pending |
 | PRSN-03 | Phase 3 | Pending |
@@ -139,10 +139,10 @@
 | TOOL-01 | Phase 3 | Pending |
 | TOOL-02 | Phase 3 | Pending |
 | TOOL-03 | Phase 3 | Pending |
-| STAT-01 | Phase 2 | Pending |
-| STAT-02 | Phase 2 | Pending |
-| STAT-03 | Phase 2 | Pending |
-| STAT-04 | Phase 2 | Pending |
+| STAT-01 | Phase 2 | Complete |
+| STAT-02 | Phase 2 | Complete |
+| STAT-03 | Phase 2 | Complete |
+| STAT-04 | Phase 2 | Complete |
 | FE-01 | Phase 1 | Complete |
 | FE-02 | Phase 1 | Complete |
 | FE-03 | Phase 1 | Complete |
