@@ -39,9 +39,9 @@
 - [x] **PRSN-01**: 32x32 pixel-art PNG sprites per archetype (script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist)
 - [x] **PRSN-02**: Sprites rendered at 64x64 with `image-rendering: pixelated`
 - [x] **PRSN-03**: Each prisoner has distinct bandana color for visual variety
-- [ ] **PRSN-04**: Framer Motion spring entrance: `x: 800 → 0`, `type: "spring"`, `stiffness: 300, damping: 20`
-- [ ] **PRSN-05**: Prisoner lands at bottom of stack with small bounce
-- [ ] **PRSN-06**: Hover shows ArrestRecord tooltip (Framer Motion AnimatePresence)
+- [x] **PRSN-04**: Framer Motion spring entrance: `x: 800 → 0`, `type: "spring"`, `stiffness: 300, damping: 20`
+- [x] **PRSN-05**: Prisoner lands at bottom of stack with small bounce
+- [x] **PRSN-06**: Hover shows ArrestRecord tooltip (Framer Motion AnimatePresence)
 
 ### Arrest Record Tooltip
 
@@ -133,9 +133,9 @@
 | PRSN-01 | Phase 3 | Complete |
 | PRSN-02 | Phase 3 | Complete |
 | PRSN-03 | Phase 3 | Complete |
-| PRSN-04 | Phase 3 | Pending |
-| PRSN-05 | Phase 3 | Pending |
-| PRSN-06 | Phase 3 | Pending |
+| PRSN-04 | Phase 3 | Complete |
+| PRSN-05 | Phase 3 | Complete |
+| PRSN-06 | Phase 3 | Complete |
 | TOOL-01 | Phase 3 | Complete |
 | TOOL-02 | Phase 3 | Complete |
 | TOOL-03 | Phase 3 | Complete |

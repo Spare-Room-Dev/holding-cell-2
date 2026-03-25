@@ -64,7 +64,7 @@ Plans:
 
 Plans:
 - [x] 03-01-PLAN.md — PrisonerSprite + ArrestRecordTooltip components (PRSN-01, PRSN-02, PRSN-03, TOOL-01, TOOL-02, TOOL-03)
-- [ ] 03-02-PLAN.md — PrisonerSlot animation + JailCellGrid layout prop (PRSN-04, PRSN-05, PRSN-06)
+- [x] 03-02-PLAN.md — PrisonerSlot animation + JailCellGrid layout prop (PRSN-04, PRSN-05, PRSN-06)
 
 ### Phase 4: Polish
 **Goal**: MVP ships with responsive layout, working archetype classification, and demo-ready experience
