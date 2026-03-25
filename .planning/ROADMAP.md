@@ -6,7 +6,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 
 ## Phases
 
-- [ ] **Phase 1: Foundation** - Backend server, fake attack generator, Socket.io real-time pipeline, dev experience
+- [x] **Phase 1: Foundation** - Backend server, fake attack generator, Socket.io real-time pipeline, dev experience
 - [ ] **Phase 2: Core Visualization** - JailCellGrid with stone texture + iron bars, StatsPanel with LED counters
 - [ ] **Phase 3: Animated Prisoners** - Pixel-art sprites with spring entrance animation, ArrestRecord tooltip on hover
 - [ ] **Phase 4: Polish** - Responsive layout, archetype classification end-to-end, demo-ready
@@ -42,8 +42,12 @@ Plans:
   4. Empty state shows "The cell is empty. Waiting for attackers..." in pixel font style
   5. StatsPanel displays: Total Attacks, Script Kiddies, APT Operatives, Botnet Drones, IoT Worms, Hacktivists
   6. Counters increment on each attack_event received with retro LED aesthetic
-**Plans**: TBD
-**UI hint**: yes
+**Plans**: 3 plans in 2 waves
+
+Plans:
+- [ ] 02-01-PLAN.md — JailCellGrid with CSS textures + PrisonerSlot (CELL-01 to CELL-06)
+- [ ] 02-02-PLAN.md — StatsPanel with LED counters (STAT-01 to STAT-04)
+- [ ] 02-03-PLAN.md — Dashboard integration with 70/30 sidebar layout
 
 ### Phase 3: Animated Prisoners
 **Goal**: Prisoner avatars enter with Framer Motion spring physics; hover shows ArrestRecord tooltip
@@ -73,8 +77,8 @@ Plans:
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/4 | Ready to execute | - |
-| 2. Core Visualization | 0/0 | Not started | - |
+| 1. Foundation | 4/4 | Complete | 2026-03-24 |
+| 2. Core Visualization | 0/3 | Ready to execute | - |
 | 3. Animated Prisoners | 0/0 | Not started | - |
 | 4. Polish | 0/0 | Not started | - |
 
@@ -84,3 +88,4 @@ Plans:
 *Granularity: coarse (4 phases)*
 *Coverage: 38/38 v1 requirements mapped*
 *Plans defined: 2026-03-24*
+*Phase 2 plans created: 2026-03-25*
