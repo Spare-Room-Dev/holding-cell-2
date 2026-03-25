@@ -54,13 +54,17 @@ Plans:
 **Depends on**: Phase 2
 **Requirements**: PRSN-01, PRSN-02, PRSN-03, PRSN-04, PRSN-05, PRSN-06, TOOL-01, TOOL-02, TOOL-03
 **Success Criteria** (what must be TRUE):
-  1. 32x32 pixel-art PNG sprites per archetype rendered at 64x64 with `image-rendering: pixelated`
-  2. Each prisoner has distinct bandana color for visual variety
-  3. Framer Motion spring entrance: `x: 800 → 0` with `type: "spring"`, `stiffness: 300, damping: 20`, lands with small bounce
-  4. Hover shows ArrestRecord tooltip: IP address, country flag emoji, protocol/port, archetype badge, time arrested
-  5. Tooltip styled as retro terminal: green text on black, monospace font, scanline overlay
-**Plans**: TBD
-**UI hint**: yes
+  1. 32x32 pixel-art inline SVG sprites per archetype rendered at 56x56 with `image-rendering: pixelated`
+  2. Each prisoner has distinct bandana color matching ARCHETYPE_COLORS mapping
+  3. Framer Motion spring entrance: `y: -100 → 0` with `type: "spring"`, `stiffness: 300, damping: 20`, lands with small bounce
+  4. Existing prisoners shift down with stiffer spring: `stiffness: 400, damping: 25`
+  5. Hover shows ArrestRecord tooltip after 150ms delay: IP address, country flag emoji, protocol/port, archetype badge, commands count, duration, time arrested
+  6. Tooltip styled as retro terminal: background #1A1A1A, phosphor border, IBM Plex Mono font
+**Plans**: 2 plans in 2 waves
+
+Plans:
+- [ ] 03-01-PLAN.md — PrisonerSprite + ArrestRecordTooltip components (PRSN-01, PRSN-02, PRSN-03, TOOL-01, TOOL-02, TOOL-03)
+- [ ] 03-02-PLAN.md — PrisonerSlot animation + JailCellGrid layout prop (PRSN-04, PRSN-05, PRSN-06)
 
 ### Phase 4: Polish
 **Goal**: MVP ships with responsive layout, working archetype classification, and demo-ready experience
@@ -79,7 +83,7 @@ Plans:
 |-------|----------------|--------|-----------|
 | 1. Foundation | 4/4 | Complete | 2026-03-24 |
 | 2. Core Visualization | 2/3 | In Progress|  |
-| 3. Animated Prisoners | 0/0 | Not started | - |
+| 3. Animated Prisoners | 0/2 | Not started | - |
 | 4. Polish | 0/0 | Not started | - |
 
 ---
@@ -89,3 +93,4 @@ Plans:
 *Coverage: 38/38 v1 requirements mapped*
 *Plans defined: 2026-03-24*
 *Phase 2 plans created: 2026-03-25*
+*Phase 3 plans created: 2026-03-25*
