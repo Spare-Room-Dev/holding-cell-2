@@ -36,18 +36,18 @@
 
 ### Prisoner Avatars
 
-- [ ] **PRSN-01**: 32x32 pixel-art PNG sprites per archetype (script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist)
-- [ ] **PRSN-02**: Sprites rendered at 64x64 with `image-rendering: pixelated`
-- [ ] **PRSN-03**: Each prisoner has distinct bandana color for visual variety
+- [x] **PRSN-01**: 32x32 pixel-art PNG sprites per archetype (script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist)
+- [x] **PRSN-02**: Sprites rendered at 64x64 with `image-rendering: pixelated`
+- [x] **PRSN-03**: Each prisoner has distinct bandana color for visual variety
 - [ ] **PRSN-04**: Framer Motion spring entrance: `x: 800 → 0`, `type: "spring"`, `stiffness: 300, damping: 20`
 - [ ] **PRSN-05**: Prisoner lands at bottom of stack with small bounce
 - [ ] **PRSN-06**: Hover shows ArrestRecord tooltip (Framer Motion AnimatePresence)
 
 ### Arrest Record Tooltip
 
-- [ ] **TOOL-01**: Tooltip displays: IP address, country flag emoji, protocol/port, archetype badge, time "arrested"
-- [ ] **TOOL-02**: Retro terminal aesthetic: green text on black, monospace font, scanline overlay
-- [ ] **TOOL-03**: Positioned above avatar, centered
+- [x] **TOOL-01**: Tooltip displays: IP address, country flag emoji, protocol/port, archetype badge, time "arrested"
+- [x] **TOOL-02**: Retro terminal aesthetic: green text on black, monospace font, scanline overlay
+- [x] **TOOL-03**: Positioned above avatar, centered
 
 ### Stats Panel
 
@@ -130,15 +130,15 @@
 | CELL-04 | Phase 2 | Complete |
 | CELL-05 | Phase 2 | Complete |
 | CELL-06 | Phase 2 | Complete |
-| PRSN-01 | Phase 3 | Pending |
-| PRSN-02 | Phase 3 | Pending |
-| PRSN-03 | Phase 3 | Pending |
+| PRSN-01 | Phase 3 | Complete |
+| PRSN-02 | Phase 3 | Complete |
+| PRSN-03 | Phase 3 | Complete |
 | PRSN-04 | Phase 3 | Pending |
 | PRSN-05 | Phase 3 | Pending |
 | PRSN-06 | Phase 3 | Pending |
-| TOOL-01 | Phase 3 | Pending |
-| TOOL-02 | Phase 3 | Pending |
-| TOOL-03 | Phase 3 | Pending |
+| TOOL-01 | Phase 3 | Complete |
+| TOOL-02 | Phase 3 | Complete |
+| TOOL-03 | Phase 3 | Complete |
 | STAT-01 | Phase 2 | Complete |
 | STAT-02 | Phase 2 | Complete |
 | STAT-03 | Phase 2 | Complete |
