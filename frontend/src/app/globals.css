@@ -155,6 +155,87 @@ body {
   box-shadow: 0 0 20px var(--color-phosphor-glow);
 }
 
+/* ============================================
+   JAIL CELL VISUAL EFFECTS
+   Phase 2: Core Visualization
+   ============================================ */
+
+/* Stone/brick texture background for jail cell */
+.cell-texture {
+  background-color: var(--color-surface);
+  background-image:
+    /* Horizontal mortar lines */
+    repeating-linear-gradient(
+      0deg,
+      transparent 0px,
+      transparent 23px,
+      rgba(42, 42, 42, 0.4) 23px,
+      rgba(42, 42, 42, 0.4) 26px
+    ),
+    /* Vertical mortar - even rows */
+    repeating-linear-gradient(
+      90deg,
+      transparent 0px,
+      transparent 50px,
+      rgba(42, 42, 42, 0.3) 50px,
+      rgba(42, 42, 42, 0.3) 54px
+    ),
+    /* Vertical mortar - odd rows (offset by half) */
+    repeating-linear-gradient(
+      90deg,
+      transparent 25px,
+      transparent 75px,
+      rgba(42, 42, 42, 0.3) 75px,
+      rgba(42, 42, 42, 0.3) 79px
+    );
+  background-size: 50px 26px;
+  border-radius: var(--radius-md);
+}
+
+/* Iron bar overlay via ::after pseudo-element */
+.cell-bars {
+  position: relative;
+}
+
+.cell-bars::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0px,
+    transparent 16px,
+    /* Bar shadow/3D effect */
+    rgba(20, 20, 20, 0.95) 16px,
+    rgba(50, 50, 50, 0.9) 17px,
+    rgba(40, 40, 40, 0.95) 18px,
+    rgba(40, 40, 40, 0.95) 20px
+  );
+  pointer-events: none;
+  z-index: 10;
+  border-radius: inherit;
+}
+
+/* CRT scanline effect for empty state */
+.crt-scanlines {
+  position: relative;
+}
+
+.crt-scanlines::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.03) 1px,
+    rgba(0, 0, 0, 0.03) 4px
+  );
+  pointer-events: none;
+  z-index: 5;
+}
+
 /* Animation for LIVE indicator pulse */
 @keyframes pulse-glow {
   0%, 100% {
