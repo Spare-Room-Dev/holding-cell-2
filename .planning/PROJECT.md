@@ -39,6 +39,9 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 | Pixel-art sprites as inline SVG | No external image dependencies, archetype colors via bandana | Implemented Phase 03 |
 | Spring physics entrance (300/20) | Bounce physics for new prisoner "wow moment" | Implemented Phase 03 |
 | Stiffer shift spring (400/25) | Avoids bounce chaos when grid reflows | Implemented Phase 03 |
+| Tailwind responsive breakpoints | md: (768px) and lg: (1024px) align with CONTEXT.md | Implemented Phase 04 |
+| Dark mode primary | Default aesthetic is dark terminal, light available via toggle | Implemented Phase 04 |
+| Mobile bottom sheet | Framer Motion AnimatePresence with drag-to-dismiss | Implemented Phase 04 |
 
 ## Design Direction
 
@@ -62,6 +65,9 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 - [x] Visual: Pixel-art prisoner sprites with Framer Motion entrance animation — Validated in Phase 03
 - [x] Visual: Dark retro-futuristic aesthetic with stone texture cell + iron bars — Validated in Phase 02
 - [x] Data: Fake attack generation with realistic country/IP weights and archetype fingerprints — Validated in Phase 01
+- [x] Polish: Responsive layout (mobile/tablet/desktop), light/dark mode toggle, mobile bottom sheet — Validated in Phase 04
+- [x] Polish: All 5 archetype classifications working per BACK-08 fingerprint rules — Validated in Phase 04
+- [x] Polish: Demo-ready MVP with number formatting (commas, 99,999+ cap) — Validated in Phase 04
 
 ## Out of Scope
 
@@ -90,4 +96,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after Phase 03 completion*
+*Last updated: 2026-03-25 after Phase 04 completion — MVP demo-ready*
