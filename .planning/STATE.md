@@ -1,85 +1,60 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: milestone
-status: Milestone complete
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-03-25T12:31:19.707Z"
+milestone: v1.1
+milestone_name: Real Threats
+status: Defining requirements
+last_updated: "2026-03-26T00:00:00.000Z"
 progress:
-  total_phases: 4
-  completed_phases: 4
-  total_plans: 12
-  completed_plans: 12
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-24)
+See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** A visually impressive, working real-time dashboard demonstrating SOC operations and threat intelligence skills through a distinctive arcade-meets-terminal aesthetic.
-**Current focus:** Phase 04 — polish
+**Current focus:** Milestone v1.1 — Real Threats (Cowrie integration + VPS deployment)
 
 ## Current Position
 
-Phase: 04
-Plan: Not started
+Phase: Not started (defining requirements)
+Plan: —
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 0
-- Average duration: n/a
-- Total execution time: 0 hours
+- Total plans completed: 12 (from v1.0)
+- Average duration: ~6 min/plan
+- Total execution time: ~72 minutes
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| Phase 01 | 4 | ~18min | ~4.5min |
+| Phase 02 | 3 | ~21min | ~7min |
+| Phase 03 | 2 | ~4min | ~2min |
+| Phase 04 | 3 | ~5min | ~1.7min |
 
 **Recent Trend:**
 
-- Last 5 plans: none yet
-- Trend: n/a
+- Last 5 plans: all completed
+- Trend: stable execution
 
 *Updated after each plan completion*
-| Phase 01 P01 | 264 | 5 tasks | 5 files |
-| Phase 01-foundation P02 | 10min | 5 tasks | 6 files |
-| Phase 01-foundation P03 | 5min | 5 tasks | 5 files |
-| Phase 01-foundation P04 | 1min | 1 tasks | 2 files |
-| Phase 02-core-visualization P01 | 8min | 3 tasks | 3 files |
-| Phase 02 P02 | 10min | 3 tasks | 3 files |
-| Phase 02-core-visualization P03 | 3min | 2 tasks | 1 files |
-| Phase 03-animated-prisoners P01 | 2min | 2 tasks | 2 files |
-| Phase 03-animated-prisoners P02 | 2min | 2 tasks | 2 files |
-| Phase 04-polish P01 | 2min | 2 tasks | 2 files |
-| Phase 04-polish P02 | 1min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- Phase 1: Approach A (fake data + Socket.io + Next.js) per PLAN.md decisions
-- Architecture: FastAPI + python-socketio async on port 8000; Next.js 14 App Router on port 3000
-- Shodan radar removed per scope reduction (Weekend 3 if desired)
-- [Phase 01]: ASGIApp wrapper pattern for combining FastAPI and python-socketio
-- [Phase 01]: asyncio.create_task on startup for background attack emitter
-- [Phase 01-foundation]: useReducer for connection state + attack array (scales better than useState)
-- [Phase 01-foundation]: Socket.io client factory pattern for testability
-- [Phase 02-core-visualization]: CSS-only stone texture and iron bar overlay using repeating-linear-gradient (no image assets)
-- [Phase 02-core-visualization]: 56px square prisoner boxes for Phase 3 sprite compatibility
-- [Phase 03-animated-prisoners]: Inline SVG sprites per archetype - no external image dependencies
-- [Phase 03-animated-prisoners]: Bandana colors match ARCHETYPE_COLORS for visual consistency
-- [Phase 03-animated-prisoners]: Manual flag emoji calculation avoids external dependencies
-- [Phase 03-animated-prisoners]: Spring physics (300/20) for entrance, stiffer (400/25) for shift - avoids bounce chaos
-- [Phase 04-polish]: BottomSheet uses Framer Motion AnimatePresence with spring animation (stiffness 300, damping 30) per DESIGN.md medium timing
-- [Phase 04-polish]: Responsive layout: flex-col default, lg:flex-row for desktop; stats button lg:hidden for mobile/tablet
+Milestone v1.1 decisions will be added as phases complete.
 
 ### Pending Todos
 
@@ -91,10 +66,9 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-03-25T12:27:00.398Z
-Stopped at: Completed 04-02-PLAN.md
+Last session: 2026-03-26
 Resume file: None
 
 ---
 
-*State last updated: 2026-03-24*
+*State last updated: 2026-03-26 — Milestone v1.1 Real Threats started*

@@ -50,12 +50,26 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 - **Typography:** Satoshi Bold (display) + DM Sans (body) + IBM Plex Mono (data)
 - **Dark mode primary** — Light mode available as toggle
 
+## Current Milestone: v1.1 Real Threats
+
+**Goal:** Deploy The Holding Cell as a public-facing demo with live Cowrie honeypot data, accessible 24/7.
+
+**Target features:**
+- Cowrie honeypot integration — capture real SSH/Telnet attacks
+- VPS deployment — run on existing server with domain
+- Docker Compose pipeline — reproducible containerized deployment
+
 ## Requirements
 
 ### Active
 
-- [ ] (Weekend 2+) Real Cowrie honeypot integration
-- [ ] (Weekend 2+) VPS deployment
+- [ ] **COW-01**: User can see real SSH/Telnet attacks from Cowrie honeypot in the dashboard
+- [ ] **COW-02**: Attack data flows from Cowrie to frontend via Socket.io in real-time
+- [ ] **COW-03**: All 5 archetypes classified from real attack fingerprints
+- [ ] **DEPLOY-01**: Dashboard accessible via public URL with HTTPS
+- [ ] **DEPLOY-02**: Docker Compose orchestrates all services (backend, frontend, Cowrie)
+- [ ] **DEPLOY-03**: Services restart automatically on failure
+- [ ] **DEPLOY-04**: HTTPS via Let's Encrypt/Certbot with existing domain
 
 ### Validated
 
@@ -96,4 +110,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-25 after Phase 04 completion — MVP demo-ready*
+*Last updated: 2026-03-26 — Milestone v1.1 Real Threats started*
