@@ -1,10 +1,8 @@
 # Feature Research: SOC / Threat Intelligence Dashboard
 
 **Domain:** Security Operations Center (SOC) dashboard with real-time honeypot attack visualization
-**Researched:** 2026-03-24
-**Confidence:** MEDIUM
-
-**Research Note:** Web search was unavailable for this session. Findings are based on training data knowledge of SOC platforms (Splunk, IBM QRadar, Microsoft Sentinel), threat intelligence platforms (MISP, OpenCTI, ThreatConnect), and honeypot systems (Cowrie, Dionaea, T-Pot). Claims should be verified via competitor product analysis if time permits.
+**Researched:** 2026-03-26 (updated for Cowrie honeypot + Docker deployment)
+**Confidence:** HIGH
 
 ---
 
@@ -23,6 +21,8 @@ Features users assume exist. Missing these = product feels broken or incomplete.
 | **Connection status indicator** | Users must know if the feed is live or disconnected. | LOW | "LIVE" badge, connection state, auto-reconnect behavior. |
 | **Dark mode** | SOC analysts work in low-light environments. Dark is the default expectation. | LOW | Explicit requirement per DESIGN.md. |
 | **Responsive layout** | Users view dashboards on different screen sizes. | LOW | Grid-based layouts handle this naturally. |
+| **Persistent container deployment** | Production honeypots run 24/7. | MEDIUM | Docker Compose with restart policies. |
+| **HTTPS access** | Security standard for public-facing apps. | MEDIUM | Nginx + Let's Encrypt Certbot. |
 
 ### Differentiators (Competitive Advantage)
 
@@ -34,10 +34,8 @@ Features that set the product apart. Not required, but memorable and impressive.
 | **Animated prisoner entrance (Framer Motion spring physics)** | Delight and demonstrate skill. Shows real-time data handling + animation competence. | MEDIUM | Physics-based spring animation. Bounce on landing creates organic feel. |
 | **Attacker archetype fingerprinting** | Educational. Shows you understand threat categories, not just raw counts. | MEDIUM | script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist archetypes with distinct fingerprints. |
 | **Hover-to-reveal arrest record** | Information on demand. Keeps UI clean while allowing deep dives. | LOW | Tooltip with IP, country, protocol, archetype, timestamp. Retro terminal aesthetic. |
-| **Attack severity / color coding** | Rapid triage. Critical attacks should visually pop. | LOW | Amber for medium, red for critical per DESIGN.md. |
-| **Attack feed replay / history** | Context for past events. "What happened while I was away?" | MEDIUM | Rolling buffer of recent attacks. Can be simple list, not full replay system. |
-| **Attack pattern indicators** | Shows analytical thinking. E.g., "This IP ran 47 passwords in 2 minutes." | LOW | Derived data shown in arrest record. |
-| **Interactive Shodan enrichment (per IP)** | External threat intelligence lookup. Demonstrates API integration skill. | MEDIUM | Removed from v1 per PLAN.md but valuable differentiator for v1.x. |
+| **Real Cowrie honeypot data** | Live threat intelligence. Shows real attacks from the internet, not simulated. | MEDIUM | Cowrie JSON log tailing + real-time Socket.io bridge. |
+| **Docker Compose one-command deploy** | Easy deployment. Demonstrates DevOps competence. | MEDIUM | Single `docker-compose up` runs everything. |
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
@@ -47,80 +45,234 @@ Features that seem good but create problems for this project specifically.
 |---------|---------------|-----------------|-------------|
 | **Full packet capture / raw log viewer** | Sounds like "more data = more impressive." | Storage, complexity, and privacy issues. Fake data doesn't benefit from this. | Raw log string in arrest record tooltip is sufficient for MVP. |
 | **Real user authentication / login system** | "Real products have auth." | Adds infrastructure complexity. This is a portfolio demo, not an enterprise product. | None needed for MVP. Consider simple password gate only if demo requires it. |
+| **Storing actual malware** | "Let's analyze downloaded files." | Security risk, legal liability in portfolio project. | Store hash + filename only, discard binary. |
+| **Direct honeypot control from dashboard** | "Let users ban IPs from dashboard." | Attack surface, breaks demo simplicity. | Read-only honeypot integration. |
+| **Historical attack database** | "Show trends over time." | Scope creep, database complexity. | Stream-only, no persistence (or defer to v2). |
 | **Multi-honeypot aggregation (Cowrie + Dionaea + T-Pot simultaneously)** | "More sources = more impressive." | Weekend 2 scope is single Cowrie integration. Premature optimization. | Single honeypot source, done well. |
 | **Full SIEM integration (Splunk, QRadar connectors)** | "Real SOCs have SIEMs." | Defeats the portfolio demo purpose. Over-engineering. | Standalone demo with simulated data is the point. |
-| **Machine learning / AI-based threat scoring** | "AI is the future." | Overkill for fake data. Real honeypot ML is a separate project entirely. | Rule-based archetype classification is sufficient and auditable. |
-| **Real-time world map with animated attack paths** | Geo-visualization sounds impressive. | Adds significant complexity (GlobeGL, deck.gl). Could distract from jail cell metaphor. | Country flags + origin list is adequate. |
+
+---
+
+## Cowrie Honeypot Integration
+
+### Attack Data Available
+
+Cowrie produces structured JSON events. Key data points for The Holding Cell:
+
+| Event Type | Description | Key Fields | Use in Dashboard |
+|------------|-------------|------------|------------------|
+| `cowrie.session.connect` | New connection | `src_ip`, `src_port`, `dst_ip`, `dst_port` | Create new prisoner avatar |
+| `cowrie.login.success` | Successful auth | `username`, `password` | Successful breach (rare, high severity) |
+| `cowrie.login.failed` | Failed auth | `username`, `password` | Brute force indicator, feed stats |
+| `cowrie.command.input` | Shell command | `input` | Behavior analysis for archetype |
+| `cowrie.session.file_upload` | Attacker uploads file | `filename`, `shasum` | Malware drop indicator |
+| `cowrie.session.file_download` | Attacker downloads file | `url`, `shasum` | Botnet malware fetch |
+| `cowrie.client.version` | SSH client info | `version` | Client fingerprinting |
+| `cowrie.client.kex` | SSH fingerprint | `hassh`, `kexAlgs`, `keyAlgs` | Archetype classification |
+
+### Archetype Classification from Cowrie Data
+
+Use Cowrie's HASSH fingerprint + behavior patterns to classify attacks into existing 5 archetypes:
+
+| Archetype | Cowrie Indicators | Classification Rules |
+|-----------|-------------------|---------------------|
+| `script_kiddie` | Common passwords (`admin`, `123456`), default SSH client (`PuTTY`, `libssh`) | Low-skill credential stuffing |
+| `botnet_drone` | Repeated connections, automated commands (`wget`, `curl`, `chmod +x`), malware downloads | Automated behavior patterns, IoT-focused |
+| `apt_operative` | Unusual SSH client fingerprint, custom commands, persistence attempts (`crontab`, `rc.local`) | HASSH fingerprint + sophisticated commands |
+| `iot_worm` | IoT-specific credentials (`admin/admin`, `root/root`), binary downloads targeting ARM/MIPS | Device-targeted credentials + architecture-specific binaries |
+| `hacktivist` | Political commands, defacement attempts, website reconnaissance | Command content analysis for intent |
+
+### Integration Architecture
+
+```
+Internet Attackers
+       │
+       ▼
+   Cowrie (Docker)
+   SSH :22  Telnet :23
+       │
+       │ JSON log
+       ▼
+   /cowrie/var/log/cowrie/cowrie.json
+       │
+       │ Docker volume mount
+       ▼
+   Python Backend (FastAPI)
+       │
+       │ Log tail + parse
+       ├──► Event classification (archetype)
+       └──► Socket.io emit
+              │
+              ▼
+   Next.js Frontend
+   JailCellGrid + StatsPanel
+```
+
+### Real-World Attack Data (2025 Study)
+
+From [Running a Cowrie Honeypot: Data and Findings](https://ambientnode.uk/running-a-cowrie-honeypot-data-and-findings/):
+
+- **89,109 events** across **20,683 sessions** in 11 days
+- **2,123 unique attacker IPs**
+- **75.6% SSH** / **24.4% Telnet** sessions
+- Top usernames: `admin`, `root`, `user`
+- Top passwords: `123456`, `root`, `abc123`
+
+---
+
+## Docker Compose Deployment
+
+### Service Architecture
+
+| Service | Port | Purpose | Dependencies |
+|---------|------|---------|--------------|
+| `cowrie` | 22:2222, 23:2223 | SSH/Telnet honeypot | None |
+| `backend` | 8000 | FastAPI + Socket.io | Cowrie volume mount |
+| `frontend` | 3000 | Next.js dashboard | Backend Socket.io |
+| `nginx` | 80, 443 | Reverse proxy + HTTPS | Frontend, Backend |
+
+### Required Docker Compose Configuration
+
+```yaml
+services:
+  cowrie:
+    image: cowrie/cowrie:latest
+    ports:
+      - "22:2222"    # SSH
+      - "23:2223"    # Telnet (optional)
+    environment:
+      - COWRIE_TELNET_ENABLED=yes
+    volumes:
+      - cowrie-var:/cowrie/cowrie-git/var
+    restart: always
+
+  backend:
+    build: ./backend
+    volumes:
+      - cowrie-var:/cowrie-data:ro  # Read Cowrie logs
+    depends_on:
+      - cowrie
+    restart: always
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      - backend
+    restart: always
+
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - letsencrypt:/etc/letsencrypt
+    depends_on:
+      - frontend
+      - backend
+    restart: always
+
+volumes:
+  cowrie-var:
+  letsencrypt:
+```
+
+### HTTPS with Let's Encrypt
+
+Use Certbot with standalone mode or Nginx integration:
+
+1. **Initial certificate**: `certbot certonly --standalone -d yourdomain.com`
+2. **Auto-renewal**: `certbot renew` in cron or Docker sidecar
+3. **Nginx routes**:
+   - `/` -> Next.js frontend (port 3000)
+   - `/socket.io` -> Backend (port 8000) -- **requires sticky sessions for WebSocket**
+   - `/api` -> FastAPI backend (port 8000)
+
+### WebSocket Sticky Sessions
+
+Critical for Socket.io: Nginx must use sticky sessions (ip_hash) to route all WebSocket connections from same client to same backend instance.
+
+```nginx
+upstream backend {
+    ip_hash;  # Sticky sessions for WebSocket
+    server backend:8000;
+}
+```
 
 ---
 
 ## Feature Dependencies
 
 ```
-Real-time Attack Feed (Socket.io)
-    └──requires──> Attack Archetype Classification
-                        └──requires──> Attack Event Data Model
+Cowrie JSON Log Access
+    └──requires──> Docker volume mount (cowrie-var)
+                       └──requires──> Backend file read permission
 
-Animated Prisoner Entrance
-    └──requires──> Prisoner Avatar Sprites
-    └──requires──> Framer Motion Animation System
-    └──enhances──> Real-time Attack Feed (provides visual payoff)
+Archetype Classification
+    └──requires──> Cowrie HASSH fingerprint data
+    └──requires──> Command input analysis
+    └──requires──> Existing BACK-08 classification rules (already implemented)
 
-Hover Arrest Record
-    └──requires──> Attack Event Data Model
-    └──requires──> Tooltip Component
+Socket.io Real-time
+    └──requires──> Nginx sticky sessions (WebSocket)
+    └──requires──> Backend Cowrie log tail process
 
-Stats Panel
-    └──requires──> Real-time Attack Feed (increments on events)
-
-Shodan Enrichment
-    └──requires──> Real-time Attack Feed (triggers on prisoner hover/click)
-    └──conflicts──> v1 scope (removed from Weekend 1)
+HTTPS Access
+    └──requires──> Domain pointed to VPS
+    └──requires──> Certbot certificate
+    └──requires──> Nginx reverse proxy
 ```
 
 ### Dependency Notes
 
-- **Real-time feed requires archetype classification:** The data model depends on having archetype labels to render. Classification logic (fake or real) must exist before the feed is useful.
-- **Prisoner animation enhances feed:** The visual payoff for receiving an attack event is the prisoner flying into the cell. If animation is missing, the feed is just a list.
-- **Shodan enrichment conflicts with v1:** It was explicitly removed from Weekend 1 scope to avoid complexity. Adding it would require re-introducing the `/shodan/:ip` endpoint and RadarWidget.
+- **Cowrie JSON Log Access requires Docker volume mount:** Backend needs read access to `/cowrie/cowrie-git/var/log/cowrie/cowrie.json`. Use shared Docker volume between Cowrie and Backend containers.
+- **Archetype Classification requires HASSH fingerprint:** Cowrie's `cowrie.client.kex` event provides `hassh` field for SSH client fingerprinting. Use this + command patterns to classify.
+- **Socket.io requires Nginx sticky sessions:** WebSocket connections break without session affinity. Use `ip_hash` in Nginx upstream.
+- **HTTPS requires Domain first:** Let's Encrypt won't issue for IP addresses. Must have domain configured and pointed to VPS before certificate request.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1)
-
-Minimum viable product -- what's needed to validate the concept and impress a recruiter.
+### Launch With (v1.0 - Fake Data) -- COMPLETE
 
 - [x] **Real-time attack feed via Socket.io** -- The core pipeline. Everything else depends on this.
-- [x] **Attack count statistics (StatsPanel)** -- Situational awareness. "How active are we?" Answer in 1 second.
-- [x] **Gamified jail cell visualization with pixel-art prisoners** -- The core differentiator. Makes threat data theatrical.
-- [x] **Animated prisoner entrance (spring physics)** -- The wow moment. Framer Motion, not CSS keyframes.
-- [x] **Hover arrest record tooltip** -- Detail on demand. IP, country, protocol, archetype, timestamp.
-- [x] **Attack archetype classification (5 types)** -- script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist. Educational AND visually distinct.
+- [x] **Attack count statistics (StatsPanel)** -- Situational awareness.
+- [x] **Gamified jail cell visualization with pixel-art prisoners** -- The core differentiator.
+- [x] **Animated prisoner entrance (spring physics)** -- The wow moment.
+- [x] **Hover arrest record tooltip** -- Detail on demand.
+- [x] **Attack archetype classification (5 types)** -- Already implemented with BACK-08 rules.
 - [x] **Connection status indicator ("LIVE" badge)** -- Analyst knows if feed is alive.
-- [x] **Dark retro-futuristic aesthetic** -- Per DESIGN.md. Bloomberg Terminal meets Hyper Light Drifter.
+- [x] **Dark retro-futuristic aesthetic** -- Per DESIGN.md.
+- [x] **Responsive layout + light/dark mode** -- Validated in Phase 04.
+
+### Launch With (v1.1 - Real Threats) -- IN PROGRESS
+
+- [ ] **Cowrie log tailing** -- Python process tails Cowrie JSON log, parses events
+- [ ] **Event parsing** -- Extract src_ip, username, password, command from Cowrie events
+- [ ] **Archetype classification from real data** -- Map Cowrie data to existing 5 archetypes
+- [ ] **Socket.io bridge** -- Emit parsed attacks to frontend in real-time
+- [ ] **Docker Compose orchestration** -- Single `docker-compose up` deploys everything
+- [ ] **Nginx reverse proxy** -- Route traffic to frontend/backend/cowrie
+- [ ] **HTTPS with Let's Encrypt** -- Secure public access on existing domain
 
 ### Add After Validation (v1.x)
 
-Features to add once core is working and portfolio demo is validated.
+Features to add once core integration works.
 
-- [ ] **Shodan IP enrichment** -- On prisoner hover, query Shodan for exposure status. Demonstrates external API integration.
-- [ ] **Attack pattern indicators** -- Derived insights: "47 password attempts," "reconnaissance detected," "unusual port scan."
-- [ ] **Attack history log (scrollable list)** -- Complementary view to the jail cell. For when recruiters want to see raw data.
-- [ ] **Demo speed mode** -- Toggle to increase attack cadence (1-2s instead of 3-8s) for live demos.
-- [ ] **Sound effects** -- Subtle "clank" on prisoner landing. Enhances theater without being annoying.
+- [ ] **Geolocation enrichment** -- Enrich IP with GeoIP data (MaxMind database)
+- [ ] **Attack statistics persistence** -- Store counts in SQLite/Redis for uptime stats
+- [ ] **Attack replay** -- Show what commands attacker ran (TTY log parsing)
 
 ### Future Consideration (v2+)
 
-Features to defer until product-market fit is established.
+Features to defer until concept proven.
 
-- [ ] **Real Cowrie honeypot integration** -- Weekend 2 per PLAN.md. Real attack data changes everything.
-- [ ] **Persistent attacker identity across sessions** -- Attacker returns, same prisoner sprite. Adds long-term narrative.
-- [ ] **Multi-honeypot aggregation** -- T-Pot ecosystem, multiple honeypot types.
-- [ ] **Geographic world map visualization** -- Animated attack paths on a globe. High complexity, could distract from jail cell.
-- [ ] **Alerting / threshold notifications** -- "More than 10 APT operatives detected!" Push notification.
-- [ ] **Export / reporting (PDF, CSV)** -- "Show me last week's attack data."
+- [ ] **Multi-sensor deployment** -- Multiple Cowrie instances feeding one dashboard
+- [ ] **Historical analysis** -- Time-series charts, attack trends
+- [ ] **SIEM integration** -- Export to Elasticsearch/Splunk
+- [ ] **Alert notifications** -- Telegram/Discord alerts for notable attacks
 
 ---
 
@@ -128,27 +280,40 @@ Features to defer until product-market fit is established.
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Real-time attack feed (Socket.io) | HIGH | MEDIUM | P1 |
-| Stats panel (attack counters) | HIGH | LOW | P1 |
-| Jail cell grid + prisoner avatars | HIGH | MEDIUM | P1 |
-| Framer Motion prisoner animation | HIGH | MEDIUM | P1 |
-| Hover arrest record tooltip | MEDIUM | LOW | P1 |
-| 5-archetype classification | MEDIUM | LOW | P1 |
-| "LIVE" connection badge | MEDIUM | LOW | P1 |
-| Dark retro aesthetic | MEDIUM | LOW | P1 |
-| Shodan enrichment | MEDIUM | MEDIUM | P2 |
-| Attack pattern indicators | MEDIUM | LOW | P2 |
-| Scrollable attack history log | MEDIUM | MEDIUM | P2 |
-| Demo speed mode | LOW | LOW | P2 |
-| Sound effects | LOW | LOW | P3 |
-| World map visualization | MEDIUM | HIGH | P3 |
-| Multi-honeypot aggregation | MEDIUM | HIGH | P3 |
-| Real Cowrie integration | HIGH | HIGH | P2 (Weekend 2) |
+| Cowrie log tailing | HIGH | LOW | P1 |
+| Event parsing + classification | HIGH | MEDIUM | P1 |
+| Docker Compose setup | HIGH | MEDIUM | P1 |
+| Nginx + HTTPS | HIGH | MEDIUM | P1 |
+| Geolocation enrichment | MEDIUM | LOW | P2 |
+| Attack statistics persistence | MEDIUM | LOW | P2 |
+| TTY log replay | LOW | HIGH | P3 |
+| Multi-sensor support | LOW | HIGH | P3 |
 
 **Priority key:**
-- P1: Must have for launch (Weekend 1)
-- P2: Should have, add when possible (Weekend 1.x)
-- P3: Nice to have, future consideration (v2+)
+- P1: Must have for v1.1 launch
+- P2: Should have, add when possible
+- P3: Nice to have, future consideration
+
+---
+
+## Implementation Complexity Notes
+
+### Low Complexity (Same Day)
+- Docker Compose file for existing services
+- Cowrie environment variable configuration (`COWRIE_TELNET_ENABLED=yes`)
+- Backend log file reading (file tail)
+- Nginx configuration for reverse proxy
+
+### Medium Complexity (1-2 Days)
+- Nginx reverse proxy configuration with WebSocket sticky sessions
+- Let's Encrypt certificate setup with auto-renewal
+- Archetype classification logic from HASSH + behavior patterns
+- Docker volume sharing between Cowrie and Backend
+
+### High Complexity (3+ Days)
+- TTY log replay (requires parsing Cowrie's binary session format)
+- Multi-sensor coordination (architecture changes)
+- Historical persistence (database schema, queries)
 
 ---
 
@@ -159,29 +324,39 @@ Features to defer until product-market fit is established.
 | Real-time feed | YES (Splunk Stream) | YES (QRadar offenses) | YES (KQL streaming) | YES (Socket.io) |
 | Attack statistics | YES (KPIs, dashboards) | YES (offense counts) | YES (workbooks) | YES (StatsPanel) |
 | Geographic origin | YES (IP mapping app) | YES (geo lookup) | YES (IP enrichment) | Country flags only |
-| Attack classification | YES (correlation rules) | YES (reference sets) | YES (analytics rules) | 5 archetypes (v1) |
+| Attack classification | YES (correlation rules) | YES (reference sets) | YES (analytics rules) | 5 archetypes |
 | Visual/animation | NO (enterprise static) | NO (enterprise static) | NO (enterprise static) | YES (pixel-art animation) |
 | Gamification | NO | NO | NO | YES (jail cell metaphor) |
-| Honeypot native | NO | NO | NO | YES (Cowrie planned) |
+| Honeypot native | NO | NO | NO | YES (Cowrie integration) |
+| One-command deploy | NO | NO | NO | YES (Docker Compose) |
 | Portfolio demo appeal | LOW | LOW | LOW | HIGH (unique) |
 
-**Key insight:** Enterprise SOC tools (Splunk, QRadar, Sentinel) are powerful but visually boring. They are built for security operations, not for impressing recruiters. The Holding Cell's gamified pixel-art approach is a deliberate trade: less enterprise functionality, more memorability for a portfolio piece.
+**Key insight:** Enterprise SOC tools (Splunk, QRadar, Sentinel) are powerful but visually boring. They are built for security operations, not for impressing recruiters. The Holding Cell's gamified pixel-art approach + real Cowrie honeypot data is a deliberate trade: less enterprise functionality, more memorability for a portfolio piece.
 
 ---
 
 ## Sources
 
+### Cowrie Honeypot
+- [Cowrie Output Event Code Reference](https://cowrie.readthedocs.io/en/latest/OUTPUT.html) -- HIGH confidence, official documentation
+- [Cowrie Docker Repository](https://docs.cowrie.org/en/stable/docker/README.html) -- HIGH confidence, official documentation
+- [Running a Cowrie Honeypot: Data and Findings](https://ambientnode.uk/running-a-cowrie-honeypot-data-and-findings/) -- MEDIUM confidence, case study with real data
+- [Real-Time Cowrie Honeypot Alerts via Telegram](https://infosecwriteups.com/real-time-cowrie-honeypot-alerts-via-telegram-track-ssh-attacks-credentials-tools-instantly-58b95c61a56b) -- MEDIUM confidence, implementation patterns
+- [Tr4pNode - Real-Time Visualization Project](https://github.com/ignacypolak1/tr4pnode) -- HIGH confidence, reference implementation
+
+### Docker Deployment
+- [Nginx + Docker + Let's Encrypt Architecture](https://blog.devops.dev/nginx-docker-lets-encrypt-a-battle-tested-reverse-proxy-architecture-91d8e9ed7f9d) -- MEDIUM confidence, community guide
+- [Docker Official: Next.js with Compose & NGINX](https://docker.com/blog/how-to-build-and-run-next-js-applications-with-docker-compose-nginx) -- HIGH confidence, official Docker guide
+- [Setting Up HTTPS with Docker Compose, Nginx, Certbot](https://medium.com/@dinusai05/setting-up-a-secure-reverse-proxy-with-https-using-docker-compose-nginx-and-certbot-lets-encrypt-cfd012c53ca0) -- MEDIUM confidence, tutorial
+- [Production-Ready Next.js 14 + FastAPI + Docker Boilerplate](https://github.com/nkz21/nextjs-fastapi-docker-boilerplate) -- HIGH confidence, reference implementation
+
+### Competitor Analysis
 - Splunk Enterprise Security product documentation (training data)
 - IBM QRadar documentation (training data)
 - Microsoft Sentinel / Azure Sentinel documentation (training data)
 - MISP (Open Source Threat Intelligence Platform) feature set (training data)
-- Cowrie honeypot documentation (training data)
-- The Honeypot Project (training data)
-- PLAN.md (project-specific requirements)
-- DESIGN.md (design system requirements)
-- PROJECT.md (project context)
 
 ---
 
 *Feature research for: SOC / Threat Intelligence Dashboard*
-*Researched: 2026-03-24*
+*Researched: 2026-03-26 (updated for Cowrie honeypot + Docker deployment)*

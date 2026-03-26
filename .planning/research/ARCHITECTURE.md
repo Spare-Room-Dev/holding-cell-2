@@ -1,12 +1,12 @@
 # Architecture Research
 
-**Domain:** SOC / Threat Intelligence Visualization Dashboard
-**Researched:** 2026-03-24
-**Confidence:** MEDIUM
+**Domain:** SOC / Threat Intelligence Visualization Dashboard + Cowrie Honeypot Integration
+**Researched:** 2026-03-26 (Updated for Milestone v1.1)
+**Confidence:** HIGH
 
 ## Standard Architecture
 
-### System Overview
+### System Overview (v1.0 - Development)
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -37,246 +37,449 @@
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Responsibilities
-
-| Component | Responsibility | Typical Implementation | Notes |
-|-----------|----------------|------------------------|-------|
-| AttackSource | Generate or forward raw attack events | FakeGenerator (Weekend 1) or CowrieLogTailer (Weekend 2) | One source per honeypot service |
-| SocketServer | Broadcast events to all connected clients | python-socketio async server | Handles room management, reconnection |
-| JailCellGrid | Visualize attacker "prisoners" in jail cell | React component + Framer Motion | Receives events via WebSocket |
-| StatsPanel | Aggregate counters (archetype tallies, totals) | React component + useReducer | Derived state from attack stream |
-| Header/LiveBadge | Show connection status and system health | React component | Auto-reconnect with backoff |
-| ArchetypeClassifier | Classify raw honeypot logs into attacker archetypes | Rule-based classifier (Weekend 1) | Heaviest logic deferred to Weekend 2 |
-
-## Recommended Project Structure
+### System Overview (v1.1 - Production with Cowrie + Docker)
 
 ```
-holding-cell/
+                                    PRODUCTION DEPLOYMENT
+                                    ────────────────────────────────────────
+                                    │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                              VPS (Production)                                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────────────┐ │
+│  │    Nginx        │    │   Cowrie        │    │   Docker Bridge Network │ │
+│  │  (Reverse Proxy)│    │   (Honeypot)    │    │   (internal comms)      │ │
+│  │  :80, :443      │    │   :22→2222      │    │                         │ │
+│  │  TLS Termination│    │   :23→2223      │    │                         │ │
+│  └────────┬────────┘    └────────┬────────┘    └─────────────────────────┘ │
+│           │                      │                                         │
+│           │                      │ cowrie.json                             │
+│           │                      ▼                                         │
+│  ┌────────▼────────┐    ┌────────────────┐    ┌─────────────────────┐    │
+│  │   Frontend       │    │    Backend      │    │  Docker Volume      │    │
+│  │   (Next.js)      │◄───│   (FastAPI +    │◄───│  cowrie-logs        │    │
+│  │   :3000          │    │   python-socketio)│    │  (shared)           │    │
+│  │                  │    │   :8000          │    │                     │    │
+│  └─────────────────┘    │                  │    └─────────────────────┘    │
+│                         │  ┌───────────────┤                              │
+│                         │  │ CowrieLog     │                              │
+│                         │  │ Monitor       │ (file watcher)              │
+│                         │  └───────────────┘                              │
+│                         └──────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Component Responsibilities
+
+| Component | Responsibility | Implementation |
+|-----------|----------------|----------------|
+| **AttackSource** | Generate or forward raw attack events | FakeGenerator (Weekend 1) or CowrieLogMonitor (Weekend 2) |
+| **SocketServer** | Broadcast events to all connected clients | python-socketio async server (existing) |
+| **JailCellGrid** | Visualize attacker "prisoners" in jail cell | React + Framer Motion (existing) |
+| **StatsPanel** | Aggregate counters (archetype tallies, totals) | React + useReducer (existing) |
+| **Header/LiveBadge** | Connection status and system health | React component (existing) |
+| **ArchetypeClassifier** | Classify honeypot logs into attacker archetypes | Rule-based classifier (existing) |
+| **Nginx** (NEW) | TLS termination, reverse proxy, WebSocket upgrade | Official nginx Docker image |
+| **CowrieLogMonitor** (NEW) | Watch cowrie.json, parse events, emit via Socket.io | Python watchdog + asyncio bridge |
+| **Cowrie** (NEW) | SSH/Telnet honeypot, capture attack sessions | Official cowrie/cowrie Docker image |
+
+## Recommended Project Structure (Updated for v1.1)
+
+```
+holding-cell-2/
+├── docker-compose.yml          # Production orchestration (NEW)
+├── docker-compose.dev.yml      # Development (fake data only) (NEW)
 ├── backend/
-│   ├── main.py                    # FastAPI app + Socket.io server bootstrap
-│   ├── socket_server.py           # Socket.io event handlers (separate for clarity)
-│   ├── models.py                  # Pydantic models (AttackEvent, etc.)
-│   ├── attack_source/
-│   │   ├── base.py               # Abstract base for attack sources
-│   │   ├── fake_generator.py     # Weekend 1: simulated attacks
-│   │   └── cowrie_tailer.py       # Weekend 2: real Cowrie log parsing
-│   ├── classifiers/
-│   │   └── archetype.py          # Archetype classification rules
-│   └── requirements.txt
-│
+│   ├── main.py                 # FastAPI + Socket.io (existing)
+│   ├── attack_generator.py     # Fake attack generator (existing)
+│   ├── cowrie_monitor.py       # NEW: File watcher for cowrie.json
+│   ├── archetypes.py           # Archetype classification (existing)
+│   ├── models.py               # Pydantic models (existing)
+│   ├── requirements.txt        # Python dependencies
+│   └── Dockerfile              # NEW: Backend container
 ├── frontend/
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── page.tsx          # Main dashboard page
-│   │   │   ├── layout.tsx
-│   │   │   └── globals.css
-│   │   │
-│   │   ├── components/
-│   │   │   ├── JailCellGrid.tsx  # Cell container + prisoner stacking
-│   │   │   ├── Prisoner.tsx      # Individual avatar (animated)
-│   │   │   ├── ArrestRecord.tsx  # Hover tooltip (IP, country, etc.)
-│   │   │   ├── StatsPanel.tsx    # Counter display
-│   │   │   ├── LiveBadge.tsx    # Connection status indicator
-│   │   │   └── Header.tsx       # Top bar with branding + status
-│   │   │
-│   │   ├── lib/
-│   │   │   ├── socket.ts         # Socket.io client (typed, with reconnect)
-│   │   │   └── useAttackStream.ts # React hook: socket → component state
-│   │   │
-│   │   ├── hooks/
-│   │   │   └── usePrisoners.ts   # Manages prisoner list (cap at 20, fade-out)
-│   │   │
-│   │   └── types/
-│   │       └── attack.ts         # Shared AttackEvent type
-│   │
-│   ├── public/
-│   │   └── sprites/              # Pixel art per archetype (SVG or PNG)
-│   │       ├── script-kiddie.svg
-│   │       ├── botnet-drone.svg
-│   │       └── ...
-│   │
+│   ├── src/                    # Next.js app (existing)
 │   ├── package.json
-│   ├── tailwind.config.ts
-│   └── next.config.js
-│
-├── honeypot/                      # (Weekend 2) Honeypot service configs
-│   └── cowrie/
-│       └── cowrie.cfg
-│
-└── README.md
+│   ├── next.config.js
+│   └── Dockerfile              # NEW: Frontend container
+├── cowrie/
+│   ├── cowrie.cfg              # Cowrie configuration (NEW)
+│   └── userdb.txt              # User database for honeypot (NEW)
+├── nginx/
+│   ├── nginx.conf              # Reverse proxy configuration (NEW)
+│   └── ssl/                    # Certbot certificates (mounted) (NEW)
+├── DESIGN.md
+├── PLAN.md
+├── CLAUDE.md
+└── .planning/
+    ├── PROJECT.md
+    └── research/
+        ├── ARCHITECTURE.md
+        ├── FEATURES.md
+        ├── PITFALLS.md
+        ├── STACK.md
+        └── SUMMARY.md
 ```
 
 ### Structure Rationale
 
-- **backend/attack_source/:** Attack sources are swappable. Approach A uses FakeGenerator; Weekend 2 introduces CowrieTailer. Both implement the same interface. This boundary prevents the socket server from knowing where events originate.
-- **frontend/components/:** UI is component-per-visual-element. JailCellGrid is the root; Prisoner is a leaf. StatsPanel and Header are siblings at the shell level.
-- **frontend/lib/:** Socket.io client is isolated here. The `useAttackStream` hook wraps it for React — keeps components declarative.
-- **frontend/hooks/:** `usePrisoners` encapsulates the 20-prisoner cap and fade-out logic. Components should not manage this themselves.
-- **honeypot/:** Cowrie runs as a separate service. The tailer reads its log file — no code coupling between honeypot and the visualization server.
+- **backend/cowrie_monitor.py:** New module for file watching - separates concerns from fake generator. Environment variable `DATA_SOURCE` selects between fake and real.
+- **cowrie/:** Isolated Cowrie configuration - easier to manage honeypot settings without touching app code.
+- **nginx/:** Production reverse proxy configuration separate from app code. Handles TLS termination.
+- **docker-compose.yml:** Production config with Cowrie, Nginx, Backend, Frontend.
+- **docker-compose.dev.yml:** Development without Cowrie (fake data only) - simpler iteration cycle.
 
 ## Architectural Patterns
 
-### Pattern 1: Event-Driven Streaming (Server-Sent WebSocket)
+### Pattern 1: Dual Data Source (Fake + Real)
 
-**What:** Backend pushes events to all connected clients over a persistent WebSocket connection. No polling.
+**What:** Backend supports both fake attack generation (development) and real Cowrie data (production) via environment variable.
 
-**When to use:** Real-time dashboards where updates are frequent and unpredictable (attack events). Traditional REST polling is too slow and creates connection overhead.
-
-**Trade-offs:**
-- Pro: Sub-second latency, works for any event frequency
-- Pro: Server controls push cadence
-- Con: Client must handle reconnection (use exponential backoff)
-- Con: WebSocket connections are stateful — harder to scale horizontally (requires sticky sessions or a message broker like Redis)
-
-**Example (Python, python-socketio):**
-```python
-import socketio
-
-sio = socketio.AsyncServer(async_mode='asgi')
-
-@sio.on('connect')
-async def on_connect(sid, environ):
-    print(f"Client connected: {sid}")
-
-@sio.on('disconnect')
-async def on_disconnect(sid):
-    print(f"Client disconnected: {sid}")
-
-async def broadcast_attack(event: AttackEvent):
-    await sio.emit('attack_event', event.model_dump())
-```
-
-### Pattern 2: Source Abstraction (Strategy Pattern for Data Sources)
-
-**What:** Multiple attack sources (fake generator, Cowrie honeypot) implement a common interface. The socket server does not care which source is active.
-
-**When to use:** When the data source will change (Weekend 1 fake -> Weekend 2 real honeypot). Avoids rewriting the server as sources evolve.
+**When to use:** Development iteration requires fake data; production needs real honeypot data.
 
 **Trade-offs:**
-- Pro: Swapping sources is a config change, not a code rewrite
-- Pro: Testing is easier — inject a mock source
-- Con: Adds an abstraction layer; must keep interface stable
+- Pro: Fast development cycle without running Cowrie locally
+- Pro: Same codebase works in both environments
+- Con: Slight code complexity in startup logic
 
 **Example:**
 ```python
-from abc import ABC, abstractmethod
+# main.py - Environment-based data source selection
+import os
 
-class AttackSource(ABC):
-    @abstractmethod
-    async def start(self, handler: Callable[[AttackEvent], None]) -> None:
-        """Start emitting events via the handler callback."""
-        pass
+DATA_SOURCE = os.getenv("DATA_SOURCE", "fake")  # "fake" or "cowrie"
 
-    @abstractmethod
-    async def stop(self) -> None:
-        pass
+@app.on_event('startup')
+async def startup() -> None:
+    if DATA_SOURCE == "cowrie":
+        asyncio.create_task(cowrie_log_monitor())
+    else:
+        asyncio.create_task(attack_emitter())
 ```
 
-### Pattern 3: Immutable Event Log with Derived State
+### Pattern 2: File Watching with asyncio Bridge
 
-**What:** Raw attack events are immutable facts. All UI state (prisoner list, counters) is derived from the event stream.
+**What:** Watchdog (synchronous) monitors cowrie.json, uses asyncio bridge to emit Socket.io events.
 
-**When to use:** When replay, audit, or time-travel debugging is desired. Even for Approach A, treating events as immutable makes the architecture more robust as complexity grows.
+**When to use:** Cowrie writes to file; need real-time emission without blocking the event loop.
 
 **Trade-offs:**
-- Pro: Clear data flow — events are the source of truth
-- Pro: Derived state is stateless — can be recomputed from events
-- Con: For high-volume streams, storing all events is memory-intensive (use a ring buffer or database for persistence)
+- Pro: No network hop between Cowrie and Backend (shared volume)
+- Pro: Cowrie writes independently; Backend picks up events
+- Con: Requires careful event loop handling (watchdog is sync, Socket.io is async)
+
+**Example:**
+```python
+# cowrie_monitor.py
+import asyncio
+import json
+from pathlib import Path
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
+
+class CowrieLogHandler(FileSystemEventHandler):
+    def __init__(self, sio, loop, last_position=0):
+        self.sio = sio
+        self.loop = loop
+        self.last_position = last_position
+
+    def on_modified(self, event):
+        if event.src_path.endswith('cowrie.json'):
+            new_events = self._read_new_events(event.src_path)
+            for event_data in new_events:
+                # Bridge sync watchdog to async Socket.io
+                asyncio.run_coroutine_threadsafe(
+                    self.sio.emit('attack_event', event_data),
+                    self.loop
+                )
+
+    def _read_new_events(self, path):
+        """Read only new lines since last position (tail -f pattern)."""
+        with open(path, 'r') as f:
+            f.seek(self.last_position)
+            new_lines = f.readlines()
+            self.last_position = f.tell()
+        return [self._parse_event(line) for line in new_lines if line.strip()]
+
+async def cowrie_log_monitor():
+    """Background task that monitors Cowrie JSON logs."""
+    loop = asyncio.get_running_loop()
+    observer = Observer()
+    handler = CowrieLogHandler(sio, loop)
+    observer.schedule(handler, path="/app/cowrie-logs", recursive=False)
+    observer.start()
+    try:
+        while True:
+            await asyncio.sleep(1)
+    finally:
+        observer.stop()
+        observer.join()
+```
+
+### Pattern 3: Docker Volume Sharing for Log Files
+
+**What:** Cowrie container writes to a Docker volume; backend container reads from the same volume.
+
+**When to use:** Inter-container file sharing without network overhead.
+
+**Trade-offs:**
+- Pro: No network hop, simple architecture
+- Pro: Both containers can run independently
+- Con: Requires both containers on same host (tight coupling)
+- Con: Must handle file rotation and position tracking
+
+**Example (docker-compose.yml):**
+```yaml
+volumes:
+  cowrie-logs:
+
+services:
+  cowrie:
+    image: cowrie/cowrie:latest
+    volumes:
+      - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
+    ports:
+      - "22:2222"   # SSH on port 22
+      - "23:2223"   # Telnet on port 23 (optional)
+
+  backend:
+    build: ./backend
+    volumes:
+      - cowrie-logs:/app/cowrie-logs:ro  # read-only
+    environment:
+      - DATA_SOURCE=cowrie
+      - COWRIE_LOG_PATH=/app/cowrie-logs/cowrie.json
+```
+
+### Pattern 4: Nginx Reverse Proxy for WebSocket + HTTPS
+
+**What:** Single Nginx container handles TLS termination and routes traffic to frontend/backend.
+
+**When to use:** Production deployment with HTTPS and WebSocket support.
+
+**Trade-offs:**
+- Pro: Standard production practice
+- Pro: Handles WebSocket upgrade correctly
+- Pro: Static file serving (Next.js build) can be optimized
+- Con: Extra container and configuration
+
+**Example (nginx.conf):**
+```nginx
+server {
+    listen 443 ssl;
+    server_name holding-cell.example.com;
+
+    ssl_certificate /etc/letsencrypt/live/holding-cell.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/holding-cell.example.com/privkey.pem;
+
+    # Frontend (Next.js)
+    location / {
+        proxy_pass http://frontend:3000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_cache_bypass $http_upgrade;
+    }
+
+    # Backend API
+    location /api/ {
+        proxy_pass http://backend:8000/;
+    }
+
+    # WebSocket (Socket.io)
+    location /socket.io/ {
+        proxy_pass http://backend:8000/socket.io/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 86400;  # Long-lived connections
+    }
+}
+
+# HTTP redirect to HTTPS
+server {
+    listen 80;
+    server_name holding-cell.example.com;
+    return 301 https://$server_name$request_uri;
+}
+```
 
 ## Data Flow
 
-### Real-Time Attack Event Flow
+### Development Flow (Fake Data)
 
 ```
-[AttackSource] ──▶ [ArchetypeClassifier] ──▶ [AttackEvent (validated)]
-                                                      │
-                                                      │ socketio.emit('attack_event', payload)
-                                                      ▼
-                                            [SocketServer broadcast]
-                                                      │
-                                                      │ WebSocket
-                                                      ▼
-                                    ┌────────────────────────────────┐
-                                    │       All Connected Clients     │
-                                    └──────────────┬─────────────────┘
-                                                   │
-                              ┌────────────────────┼────────────────────┐
-                              ▼                    ▼                    ▼
-                     [JailCellGrid]        [StatsPanel]         [Header]
-                     (add prisoner)         (increment)      (update live badge)
+[AttackEmitter (asyncio task)]
+    ↓ generate_fake_attack() every 3-8 seconds
+[AttackEvent (Pydantic model)]
+    ↓ sio.emit('attack_event', event)
+[Frontend Socket.io client]
+    ↓ receives attack_event
+[JailCellGrid + StatsPanel]
 ```
 
-### State Management
+### Production Flow (Real Cowrie Data)
 
 ```
-[Socket.io Event]
-       │
-       ▼
-[useAttackStream hook] ──▶ [Events array (ring buffer, last 1000)]
-       │                          │
-       │ (derived)                │ (derived)
-       ▼                          ▼
-[usePrisoners hook] ◀──── Stats + Prisoner List
-       │
-       ▼
-[React Components re-render]
+[Attacker SSH/Telnet]
+    ↓ connects to port 22/23
+[Cowrie Honeypot]
+    ↓ appends JSON line to cowrie.json
+[Docker Volume (shared)]
+    ↓
+[Watchdog FileSystemEventHandler]
+    ↓ reads new lines, parses JSON
+[CowrieToAttackEvent adapter]
+    ↓ classifies archetype, enriches with GeoIP
+[AttackEvent (Pydantic model)]
+    ↓ asyncio.run_coroutine_threadsafe(sio.emit(...))
+[Frontend Socket.io client]
+    ↓ receives attack_event
+[JailCellGrid + StatsPanel]
 ```
 
-### Key Data Flows
+### Cowrie Event to AttackEvent Mapping
 
-1. **Attack arrival:** AttackSource emits event -> SocketServer broadcasts -> `useAttackStream` receives -> `usePrisoners` appends (capped at 20) -> `JailCellGrid` renders new Prisoner with Framer Motion entrance animation
-2. **Counter update:** Same event -> StatsPanel increments relevant archetype counter
-3. **Connection recovery:** Client disconnects -> `socket.ts` auto-reconnects with backoff -> on reconnect, `useAttackStream` requests last-N events from server (if implemented) or simply resumes streaming
+| Cowrie Event | AttackEvent Fields | Notes |
+|--------------|-------------------|-------|
+| `cowrie.session.connect` | ip, port, timestamp, protocol | New session started |
+| `cowrie.login.failed` | ip, commands (username/password attempts) | Brute force attempts |
+| `cowrie.login.success` | ip, commands (successful credentials) | Successful login |
+| `cowrie.command.input` | commands | Commands executed in session |
+| `cowrie.session.closed` | duration | Session ended, calculate total |
+
+### AttackEvent Field Mapping from Cowrie JSON
+
+```python
+def cowrie_to_attack_event(cowrie_event: dict) -> AttackEvent:
+    """Convert Cowrie JSON event to AttackEvent."""
+    # Base fields (present in all events)
+    ip = cowrie_event.get("src_ip", "unknown")
+    timestamp = cowrie_event.get("timestamp", datetime.utcnow().isoformat())
+    session_id = cowrie_event.get("session", "")
+
+    # Protocol detection
+    protocol = "SSH" if cowrie_event.get("protocol") == "ssh" else "Telnet"
+
+    # Port from dst_port or default
+    port = cowrie_event.get("dst_port", 22)
+
+    # Classify archetype from session behavior
+    archetype = classify_archetype_from_session(cowrie_event)
+
+    # GeoIP lookup (can use MaxMind or ip-api.com)
+    country, country_code = get_country_from_ip(ip)
+
+    # Commands from session (varies by event type)
+    commands = extract_commands_from_event(cowrie_event)
+
+    # Duration from session closed event
+    duration = calculate_duration(cowrie_event)
+
+    return create_attack_event(
+        ip=ip,
+        country=country,
+        countryCode=country_code,
+        port=port,
+        protocol=protocol,
+        archetype=archetype,
+        commands=commands,
+        duration=duration,
+        rawLog=json.dumps(cowrie_event)
+    )
+```
+
+### Session-based Classification
+
+Cowrie events are session-based. To classify archetypes correctly, you must correlate events by session ID:
+
+```
+1. cowrie.session.connect (src_ip, src_port, dst_port) → Start session
+2. cowrie.login.failed (username, password) → Brute force attempts
+3. cowrie.command.input (input) → Commands executed
+4. cowrie.session.closed (duration) → End session, emit final AttackEvent
+```
+
+**Recommendation:** Maintain an in-memory session cache that accumulates events by session ID, then emits a complete AttackEvent when `cowrie.session.closed` is received.
 
 ## Scaling Considerations
 
 | Scale | Architecture Adjustments |
 |-------|--------------------------|
-| 0-1k concurrent viewers | Single FastAPI + Socket.io instance is fine. No message broker needed. |
-| 1k-10k concurrent viewers | Add Redis adapter for python-socketio. Horizontal Socket.io server scaling with sticky sessions. |
-| 10k+ concurrent viewers | Consider separating the WebSocket tier from the event ingestion tier. A message queue (Kafka/RabbitMQ) sits between honeypot logs and the WebSocket servers. |
+| Demo/Portfolio (0-100 connections) | Single VPS, Docker Compose, sufficient |
+| Higher traffic (100-1000) | Add rate limiting in Nginx, consider Redis for Socket.io |
+| Production monitoring | Add Prometheus/Grafana containers for metrics |
 
 ### Scaling Priorities
 
-1. **First bottleneck: WebSocket connection limit.** A single Node.js/Socket.io process handles ~10k concurrent connections. FastAPI with python-socketio is similar. Add horizontal scaling + Redis before hitting this limit.
-2. **Second bottleneck: Event broadcast fan-out.** At high attack volume or many viewers, broadcasting every event to every socket is O(n*m). Redis Pub/Sub distributes the load across multiple Socket.io instances.
-3. **Third bottleneck: Persistence.** At very high attack volume, in-memory event buffer overflows. Move to a ring buffer database (TimescaleDB, SQLite with size limit) for the event log.
-
-For this project (single-viewer portfolio piece, honeypot attack volume): current architecture is sufficient at least 100x over-provisioned.
+1. **First bottleneck:** WebSocket connections - Socket.io handles well, but may need Redis adapter for multi-backend scaling
+2. **Second bottleneck:** Cowrie log file I/O - Consider batching events if file grows large
+3. **Third bottleneck:** TLS termination - Nginx handles this well; no changes needed until very high load
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Polling-Based Real-Time
+### Anti-Pattern 1: Synchronous File Reading in Async Context
 
-**What people do:** Use `setInterval` on the frontend to poll a REST endpoint every 1-5 seconds for new attacks.
+**What people do:** Read entire cowrie.json file on each event.
 
-**Why it's wrong:** Creates artificial latency (up to N seconds per event), clutters logs with polling requests, and the REST endpoint becomes a bottleneck at higher scale.
+**Why it's wrong:** Blocks event loop, causes WebSocket lag, O(n) file size.
 
-**Do this instead:** WebSocket push from the server. If REST is required for browser compatibility, use Server-Sent Events (SSE) as a fallback.
+**Do this instead:** Track file position, read only new lines (tail -f pattern).
 
-### Anti-Pattern 2: Embedding Business Logic in Socket Handlers
+```python
+# BAD - blocks event loop
+with open('cowrie.json') as f:
+    events = json.loads(f.read())  # Blocks!
 
-**What people do:** Put archetype classification, IP geolocation lookups, and event transformation directly inside the Socket.io `emit` call.
+# GOOD - incremental read
+def _read_new_events(self, path):
+    with open(path, 'r') as f:
+        f.seek(self.last_position)  # Resume from last read
+        new_lines = f.readlines()
+        self.last_position = f.tell()
+    return [json.loads(line) for line in new_lines if line.strip()]
+```
 
-**Why it's wrong:** Socket handlers become a dumping ground. Testing requires a full Socket.io server. Reusing logic (e.g., for a REST endpoint that returns historical data) becomes impossible.
+### Anti-Pattern 2: Exposing Cowrie Directly to Internet
 
-**Do this instead:** Process events in the AttackSource or a dedicated pipeline stage before emitting. Socket.io should only serialize and transmit.
+**What people do:** Run Cowrie on default ports 22/23 without firewall rules.
 
-### Anti-Pattern 3: Storing Derived State as Source of Truth
+**Why it's wrong:** Real SSH server conflicts; security risk if Cowrie has vulnerabilities.
 
-**What people do:** Increment a `total_attacks` counter variable on the server and read it directly, instead of counting events.
+**Do this instead:** Move real SSH to alternate port (22222), use firewall rules, run Cowrie in isolated Docker network.
 
-**Why it's wrong:** Counters can drift. If a client disconnects mid-event, the counter may be incremented but the client never received it. Derived state is correct only if computed from the canonical event log.
+```bash
+# Move real SSH to alternate port
+sudo sed -i 's/^#\?Port .*/Port 22222/' /etc/ssh/sshd_config
+sudo ufw allow 22222/tcp
+sudo systemctl reload ssh
+```
 
-**Do this instead:** All state is derived from the event log. Counters are computed by querying the log. This is especially important when implementing session replay or historical views.
+### Anti-Pattern 3: Missing TLS for WebSocket
 
-### Anti-Pattern 4: No Reconnection Strategy
+**What people do:** Configure WebSocket without considering HTTPS/WSS.
 
-**What people do:** Establish a WebSocket connection once on page load, with no retry logic if it drops.
+**Why it's wrong:** Mixed content errors; browsers block ws:// from https:// pages.
 
-**Why it's wrong:** Network interruptions happen. The dashboard silently goes stale with no indication to the user.
+**Do this instead:** Nginx terminates TLS, proxies WebSocket upgrade to backend.
 
-**Do this instead:** Implement exponential backoff reconnection (1s, 2s, 4s, 8s, max 30s). Show a "SIGNAL LOST" / "RECONNECTING" status in the UI. PLAN.md has already addressed this with the 30s max backoff.
+### Anti-Pattern 4: Hot Reloading with Volume Mounts in Production
+
+**What people do:** Use development-style volume mounts for code in production.
+
+**Why it's wrong:** Security risk, performance overhead, unintended code updates.
+
+**Do this instead:** Production builds copy code into image; no volume mounts for app code.
+
+### Anti-Pattern 5: Blocking Port 80
+
+**What people do:** Block port 80 for security.
+
+**Why it's wrong:** Let's Encrypt ACME HTTP-01 challenges require port 80.
+
+**Do this instead:** Keep port 80 open, redirect to HTTPS. Configure Nginx to serve ACME challenge responses.
 
 ## Integration Points
 
@@ -284,26 +487,60 @@ For this project (single-viewer portfolio piece, honeypot attack volume): curren
 
 | Service | Integration Pattern | Notes |
 |---------|---------------------|-------|
-| Cowrie Honeypot | File tailer reading Cowrie JSON logs | Cowrie outputs to `%(logdir)s/cowrie.json`. The tailer follows the file (handles log rotation). Runs as a background task in the Python server. |
-| Shodan API | REST API via httpx (async HTTP client) | Deferred to Weekend 3. Rate limit is the primary concern — implement a cache (60s TTL) and a polling interval of at least 60s between requests per IP. |
-| IP Geolocation | MaxMind GeoIP or ip-api.com (free tier) | ip-api.com has 45 req/min limit on free tier. Cache aggressively. MaxMind GeoLite2 is more reliable for production. |
+| **Cowrie Honeypot** | Docker volume shared log file | `/var/log/cowrie/cowrie.json` |
+| **GeoIP lookup** | httpx async API call (optional) | Can use MaxMind GeoIP2 or ip-api.com |
+| **Let's Encrypt** | Certbot in Nginx container | Auto-renewal via cron or Certbot sidecar |
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| AttackSource -> SocketServer | In-process callback or asyncio Queue | The source emits events; the server broadcasts. No network hop needed. |
-| Frontend -> Backend | WebSocket (Socket.io protocol) | Socket.io adds reconnection, heartbeat, and rooms on top of raw WebSocket. |
-| Frontend components -> Socket | React hook (`useAttackStream`) | Components never interact with socket directly. The hook manages subscription lifecycle. |
+| Frontend ↔ Backend | Socket.io WebSocket | Existing implementation |
+| Backend ↔ Cowrie logs | Docker volume (file read) | Shared volume read-only for backend |
+| Nginx ↔ Frontend | HTTP proxy | Static Next.js build |
+| Nginx ↔ Backend | HTTP proxy + WebSocket upgrade | Socket.io requires upgrade header |
+
+### Docker Compose Service Dependencies
+
+```yaml
+services:
+  nginx:
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+
+  frontend:
+    depends_on:
+      - backend
+
+  backend:
+    depends_on:
+      - cowrie  # Wait for log volume to exist
+    environment:
+      - DATA_SOURCE=cowrie
+
+  cowrie:
+    # No depends_on - standalone honeypot
+    ports:
+      - "22:2222"
+      - "23:2223"
+```
 
 ## Sources
 
-- python-socketio async server patterns — official documentation (MEDIUM confidence)
-- SOC dashboard architecture patterns — general knowledge from threat intelligence platform design (MEDIUM confidence)
-- Cowrie honeypot log format and integration — Cowrie GitHub repository documentation (MEDIUM confidence)
-- WebSocket scaling with Socket.io + Redis — Socket.io documentation (MEDIUM confidence)
+- [Cowrie Official Documentation](https://docs.cowrie.org/en/stable/README.html) - HIGH confidence
+- [Cowrie Docker Hub](https://hub.docker.com/r/cowrie/cowrie) - HIGH confidence
+- [Cowrie Output Event Reference](https://docs.cowrie.org/en/latest/OUTPUT.html) - HIGH confidence
+- [python-socketio AsyncServer Documentation](https://python-socketio.readthedocs.io/en/v4/server.html) - HIGH confidence
+- [Watchdog + FastAPI Integration](https://lifetechia.com/python-automation-with-watchdog-and-fastapi/) - MEDIUM confidence
+- [Nginx + Docker + Let's Encrypt Architecture](https://blog.devops.dev/nginx-docker-lets-encrypt-a-battle-tested-reverse-proxy-architecture-91d8e9ed7f9d) - MEDIUM confidence
+- [Docker Compose FastAPI Next.js Boilerplate](https://dev.to/nkz21/i-built-a-production-ready-nextjs-14-fastapi-docker-boilerplate-free-pro-version-3ln0) - MEDIUM confidence
+- [Cowrie JSON Log Analysis](https://defrancisco.us/blog/index.php/2023/07/29/understanding-the-cowrie-feed/) - MEDIUM confidence
 
 ---
 
-*Architecture research for: SOC / Threat Intelligence Visualization Dashboard*
-*Researched: 2026-03-24*
+*Architecture research for: SOC / Threat Intelligence Visualization Dashboard + Cowrie Integration*
+*Researched: 2026-03-26 (Updated for Milestone v1.1)*

@@ -1,149 +1,158 @@
 # Project Research Summary
 
-**Project:** The Holding Cell (SOC / Threat Intelligence Dashboard)
-**Domain:** Real-time security operations center dashboard with gamified visualization
-**Researched:** 2026-03-24
-**Confidence:** MEDIUM
+**Project:** The Holding Cell
+**Domain:** SOC / Threat Intelligence Dashboard with Cowrie Honeypot Integration
+**Researched:** 2026-03-26
+**Confidence:** HIGH
 
 ## Executive Summary
 
-This is a portfolio-ready SOC dashboard that visualizes honeypot attacks as pixel-art prisoners in a jail cell. The core insight from research is that enterprise SOC tools (Splunk, QRadar, Sentinel) are powerful but visually boring -- memorability comes from the theatrical jail cell metaphor, not enterprise functionality. The recommended architecture uses Next.js 14 App Router for the frontend with Framer Motion for physics-based prisoner animations, paired with a FastAPI + python-socketio backend for real-time event streaming.
+The Holding Cell is a real-time security operations center dashboard that visualizes SSH/Telnet attack data from a Cowrie honeypot. The v1.0 (fake data) implementation is complete with a gamified jail-cell metaphor using pixel-art animated prisoners. The next milestone (v1.1) adds real threat intelligence by integrating Cowrie honeypot data, Docker Compose orchestration, and production VPS deployment with HTTPS.
 
-The key risk is premature scope expansion. The gamified visualization is the differentiator; adding enterprise features (multi-honeypot aggregation, full SIEM connectors, ML threat scoring) before the core experience works would dilute the portfolio value. Version numbers in the stack research are based on training data (web search was unavailable during research) and must be verified with `npm/pip view` before implementation.
+The recommended approach uses a file-watching pattern where the Python backend tails Cowrie's JSON log file via a shared Docker volume, parses events in real-time, and broadcasts them via Socket.io to the Next.js frontend. This architecture avoids network hops between containers while maintaining clean separation of concerns. Docker Compose orchestrates all services (Cowrie, Backend, Frontend, Nginx, Redis) with proper health checks and network isolation.
+
+Key risks center on security: running the honeypot requires strict network segmentation (Cowrie isolated from backend/frontend), proper user isolation (never run as root), and firewall rules to expose only honeypot ports publicly while restricting dashboard access. WebSocket connections behind Nginx require specific configuration to avoid 60-second disconnects. Let's Encrypt rate limits must be respected during testing.
 
 ## Key Findings
 
 ### Recommended Stack
 
-**Frontend:** Next.js 14 (App Router) + React 18 + TypeScript 5 + Tailwind CSS 3.4 + Framer Motion 11 + Socket.io Client 4
-**Backend:** Python 3.11+ + FastAPI 0.110 + python-socketio 5 (async) + uvicorn 0.27 + Pydantic 2
-**Supporting:** httpx for async HTTP (Shodan integration in v1.x)
+The existing tech stack (Next.js 14, FastAPI, python-socketio, Tailwind CSS, Framer Motion) is validated and production-ready. New additions for v1.1 include Docker Compose for orchestration, Nginx for reverse proxy with TLS termination, and watchdog/aiofiles for real-time Cowrie log monitoring.
 
-The App Router is the 2024-2025 standard; Server Components reduce client bundle. Framer Motion is required for the physics-based spring bounce animation on prisoner entrance -- CSS keyframes cannot replicate the organic feel. python-socketio 5 is the async standard; Socket.io 3.x forces thread-based event loop and must be avoided. FastAPI's native async pairs better with python-socketio's asyncio engine than Flask would.
+**Core technologies:**
+- **Next.js 14 (App Router)**: React framework — App Router is the 2024-2025 standard with server components
+- **FastAPI + python-socketio 5.16**: Backend — Native async support pairs well with Cowrie log watching
+- **Cowrie (Docker)**: Honeypot — Industry-standard medium-interaction honeypot with JSON output
+- **Nginx + Certbot**: Reverse proxy — TLS termination with Let's Encrypt auto-renewal
+- **Docker Compose**: Orchestration — Single-command deployment for all services
 
 ### Expected Features
 
-**Must have (table stakes):**
-- Real-time attack feed via Socket.io -- core pipeline, everything depends on this
-- Attack count statistics -- situational awareness in one second
-- Geographic origin (country flags) -- attackers come from somewhere
-- Connection status indicator -- "LIVE" badge with auto-reconnect
-- Dark mode -- SOC analysts work in low-light; explicitly required by DESIGN.md
+**Must have (table stakes) — v1.1 Launch:**
+- Real-time attack feed via Socket.io — core value proposition
+- Attack count statistics — situational awareness
+- Gamified jail cell visualization — core differentiator (COMPLETE in v1.0)
+- Connection status indicator — analysts know if feed is live
+- HTTPS access — security standard for public apps
+- Docker Compose one-command deploy — DevOps competence demonstration
 
-**Should have (differentiators):**
-- Gamified jail cell visualization with pixel-art prisoners -- the "wow moment"
-- Animated prisoner entrance with Framer Motion spring physics -- shows real-time data handling + animation competence
-- Hover arrest record tooltip -- IP, country, protocol, archetype, timestamp on demand
-- 5-archetype classification (script_kiddie, botnet_drone, apt_operative, iot_worm, hacktivist) -- educational and visually distinct
-- Attack severity color coding -- amber for medium, red for critical
+**Should have (competitive):**
+- Attacker archetype fingerprinting — educational, shows threat understanding (implemented, needs real data mapping)
+- Hover-to-reveal arrest record — detail on demand (COMPLETE in v1.0)
+- Real Cowrie honeypot data — live threat intelligence vs. simulated
 
-**Defer to v2+:**
-- Real Cowrie honeypot integration (Weekend 2 per PLAN.md)
-- Shodan IP enrichment (v1.x after core is validated)
-- Multi-honeypot aggregation (T-Pot ecosystem)
-- Geographic world map with animated attack paths
-- ML-based threat scoring
-- Export/reporting
+**Defer (v2+):**
+- Geolocation enrichment (MaxMind GeoIP)
+- Attack statistics persistence (SQLite/Redis)
+- Multi-honeypot aggregation
+- Historical analysis / time-series charts
 
 ### Architecture Approach
 
-Event-driven streaming with WebSocket. The backend AttackSource emits events through an ArchetypeClassifier into validated AttackEvents, which the SocketServer broadcasts to all connected clients. Source abstraction (Strategy pattern) allows swapping FakeGenerator for CowrieLogTailer without code changes. Frontend components receive events via `useAttackStream` hook and derive all state from the event stream -- no client-side counters as source of truth.
+The system uses a dual data source pattern: fake attack generator for development iteration, Cowrie log monitor for production. This allows fast local development without running the honeypot. The file-watching pattern uses watchdog (synchronous) with asyncio bridge to emit Socket.io events without blocking the event loop.
 
 **Major components:**
-1. **AttackSource** -- generates or forwards raw attack events (FakeGenerator or CowrieLogTailer)
-2. **SocketServer** -- broadcasts events to all connected clients (python-socketio async)
-3. **JailCellGrid** -- renders prisoners with Framer Motion entrance animation
-4. **StatsPanel** -- aggregates archetype counters from event stream
-5. **LiveBadge** -- shows connection status with exponential backoff reconnection
-6. **useAttackStream hook** -- isolates Socket.io client from components
+1. **CowrieLogMonitor** — Tails cowrie.json, parses JSON events, bridges to async Socket.io emission
+2. **SocketServer** — Broadcasts attack events to all connected frontend clients (existing)
+3. **JailCellGrid** — Visualizes attacker "prisoners" with Framer Motion spring physics (existing)
+4. **Nginx** — TLS termination, WebSocket upgrade handling, reverse proxy routing
+5. **Docker Networks** — honeypot network (isolated), app network (internal communication)
 
 ### Critical Pitfalls
 
-1. **No reconnection strategy** -- network interruptions happen. Implement exponential backoff (1s, 2s, 4s, 8s, max 30s) with "SIGNAL LOST" UI indicator.
-2. **Embedding business logic in Socket handlers** -- classification and transformation belong in AttackSource pipeline, not in emit calls.
-3. **Polling-based "real-time"** -- setInterval polling is wrong. Use WebSocket push.
-4. **Storing derived state as source of truth** -- server counters drift; all state derives from immutable event log.
-5. **Premature scope expansion** -- adding multi-honeypot or SIEM connectors before the core experience works dilutes portfolio value.
+1. **Running Cowrie as root** — Create dedicated `cowrie` user, use `user: "1000:1000"` in Docker Compose
+2. **Poor network isolation** — Separate Docker networks for honeypot vs. app, use iptables to block Cowrie outbound
+3. **WebSocket drops behind Nginx** — Set `proxy_read_timeout 3600s` and include Upgrade/Connection headers
+4. **Let's Encrypt rate limits** — Always use `--staging` for testing; production limit is 5 duplicate certs/week
+5. **SSH port conflict** — Move real SSH to alternate port (22022), redirect port 22 to Cowrie via iptables
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-### Phase 1: Foundation (Backend + Real-Time Pipeline)
-**Rationale:** The entire visualization depends on the Socket.io event pipeline. Nothing else works without this.
-**Delivers:** FastAPI app with Socket.io server, FakeGenerator producing attack events, typed AttackEvent model with Pydantic 2, client connection with auto-reconnect.
-**Avoids:** PITFALL: no reconnection strategy. Build reconnection from day one.
+### Phase 1: Cowrie Integration Setup
+**Rationale:** The honeypot is the data source. Must have Cowrie generating real attack data before backend can process it. This phase establishes the foundation for all real threat intelligence.
+**Delivers:** Running Cowrie honeypot, Docker volume sharing, backend log watcher, event parsing
+**Addresses:** Real Cowrie honeypot data, one-command deploy foundation
+**Avoids:** Running Cowrie as root, SSH port conflict, poor network isolation
+**Research flag:** STANDARD — well-documented Cowrie Docker setup
 
-### Phase 2: Core Visualization (JailCellGrid + StatsPanel)
-**Rationale:** The jail cell metaphor is the product. Stats provide situational awareness. These should land before animation work so the data flow is proven.
-**Delivers:** JailCellGrid with 20-prisoner cap, StatsPanel with archetype counters, LiveBadge connection indicator, dark retro-futuristic aesthetic per DESIGN.md.
-**Uses:** Framer Motion 11, Tailwind CSS 3.4 with DESIGN.md tokens.
+### Phase 2: Docker Compose Orchestration
+**Rationale:** Production deployment requires coordinating multiple services. Docker Compose manages Cowrie, Backend, Frontend, Nginx, Redis with proper dependency ordering and health checks.
+**Delivers:** Complete production stack in docker-compose.yml, health checks, custom networks
+**Uses:** Docker Compose, Redis for Socket.IO scaling, health check patterns
+**Implements:** Nginx reverse proxy, WebSocket configuration
+**Research flag:** STANDARD — common Docker Compose patterns
 
-### Phase 3: Animated Prisoner Experience
-**Rationale:** The physics-based spring entrance animation is the "wow moment" that differentiates from every other SOC dashboard. It depends on Phase 2 having the static visualization working.
-**Delivers:** Prisoner component with sprite per archetype, Framer Motion spring physics (bounce on landing), hover ArrestRecord tooltip.
-**Avoids:** PITFALL: business logic in socket handlers. Animation data flows through the hook, not socket logic.
+### Phase 3: VPS Deployment & Security
+**Rationale:** Public-facing deployment requires HTTPS, firewall rules, and security hardening. Let's Encrypt setup and Nginx TLS termination are production requirements.
+**Delivers:** HTTPS access, firewall rules, dashboard IP restriction, rate limiting
+**Uses:** Certbot, Nginx SSL configuration, UFW/iptables
+**Avoids:** Exposed dashboard, CORS wildcard, hardcoded secrets
+**Research flag:** NEEDS RESEARCH — VPS-specific configurations (DNS setup, provider-specific firewall)
 
-### Phase 4: Validation Polish
-**Rationale:** MVP should ship with features that impress recruiters, not half-working experiments. This phase ensures everything is solid.
-**Delivers:** Attack archetype classification (5 types) working end-to-end, responsive layout, 5-archetype sprite set, demo speed mode toggle.
-**Addresses:** FEATURES.md P1 features -- this completes the MVP definition.
+### Phase 4: Real Data Validation
+**Rationale:** End-to-end validation that real attacks flow from Cowrie through backend to frontend. Session-based classification logic must be tested with real attack patterns.
+**Delivers:** Working production deployment with real threat data, archetype classification from real sessions
+**Uses:** Session caching, archetype mapping rules
+**Implements:** AttackEvent mapping from Cowrie JSON format
+**Research flag:** STANDARD — existing BACK-08 classification rules adapt to real data
 
 ### Phase Ordering Rationale
 
-- Phase 1 first: backend pipeline is the foundation; no visualization works without it
-- Phase 2 before 3: static visualization should work before adding animation complexity
-- Phase 3 wow moment: Framer Motion spring animation requires proven data flow first
-- Phase 4 polish: MVP requires everything working, not everything attempted
-- Shodan enrichment and Cowrie integration are Weekend 2+ scope per PLAN.md
+- **Cowrie first (Phase 1)** because no real data flows without the honeypot running. The Docker volume and log access patterns must be established before backend integration.
+- **Docker Compose second (Phase 2)** because it orchestrates all services together. Health checks and network configuration must be in place before production deployment.
+- **VPS Security third (Phase 3)** because HTTPS and firewall rules require a working stack first. Security without a working application is premature.
+- **Validation last (Phase 4)** because real data validation requires all components working in production.
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 3 (Animation):** Framer Motion 11 server component patterns -- verify API compatibility with Next.js 14 App Router. Training data suggests compatibility but not verified with Context7.
-- **Phase 1 (Backend):** python-socketio async integration with FastAPI ASGI -- documented in training data, verify with official docs before implementing.
+- **Phase 3 (VPS Deployment):** Domain DNS configuration is provider-specific; Certbot renewal hooks need testing; VPS provider may have specific firewall interfaces (AWS Security Groups vs. DigitalOcean UFW).
 
 Phases with standard patterns (skip research-phase):
-- **Phase 2 (StatsPanel, JailCellGrid):** React component patterns are well-documented. Socket.io client hook pattern is standard.
-- **Phase 4 (Polishing):** Feature implementations are incremental improvements, not new patterns.
+- **Phase 1 (Cowrie Integration):** Well-documented Docker setup, official cowrie/cowrie image, established log format.
+- **Phase 2 (Docker Compose):** Common patterns for multi-service orchestration, health checks are standard Docker feature.
+- **Phase 4 (Validation):** Uses existing classification rules (BACK-08), Cowrie event format is documented.
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | Web search unavailable during research. Version numbers from training data (late 2024). Verify with `npm/pip view` before implementation. |
-| Features | MEDIUM | Based on training data knowledge of SOC platforms (Splunk, QRadar, Sentinel) and honeypot systems (Cowrie, Dionaea). Competitor analysis via product docs not available during this session. |
-| Architecture | MEDIUM | python-socketio async patterns from official docs (training data). Event-driven architecture is standard; no novel patterns introduced. |
-| Pitfalls | MEDIUM | Anti-patterns identified from general knowledge and architecture best practices. PITFALLS.md was not provided in this research cycle -- flagged as gap below. |
+| Stack | HIGH | Verified via PyPI, Docker Hub, official documentation (Mar 2026) |
+| Features | HIGH | Clear table stakes vs differentiators, competitor analysis completed |
+| Architecture | HIGH | Official Cowrie docs, Socket.IO docs, Docker patterns well-established |
+| Pitfalls | HIGH | Official Microsoft Sentinel integration guide, Socket.IO troubleshooting docs, recent security analysis |
 
-**Overall confidence:** MEDIUM
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **PITFALLS.md not provided:** No critical/moderate/minor pitfalls document was included in this research cycle. The anti-patterns listed above are derived from ARCHITECTURE.md's anti-patterns section, not a dedicated pitfalls analysis. During roadmap creation, a dedicated pitfalls review should be scheduled.
-- **Version verification needed:** All specific package versions (0.110.0, 0.27.0, etc.) are single-source training data. Must run `npm view <package> version` and `pip show <package>` before implementation.
-- **DESIGN.md integration:** DESIGN.md was referenced but not read during research. Confirm that Tailwind CSS 3.4 configuration aligns with DESIGN.md spacing and color tokens before Phase 2.
-- **Framer Motion + Next.js 14 App Router:** Training data suggests Framer Motion 11 has improved server component support, but this has not been verified with Context7 or official Framer Motion docs.
+- **Domain configuration:** DNS setup varies by registrar; needs VPS-specific planning during Phase 3
+- **VPS provider firewall:** AWS Security Groups vs. DigitalOcean UFW vs. Hetzner firewall — specific to chosen provider
+- **Cowrie user database:** Default credentials vs. custom userdb.txt configuration — needs decision during Phase 1
+- **Certbot auto-renewal:** Systemd timer vs. Docker sidecar vs. cron — needs selection during Phase 3
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- None available -- web search and external fetch were unavailable during research session.
+- [PyPI] python-socketio 5.16.1, FastAPI 0.135.2 — verified Mar 2026
+- [Docker Hub] cowrie/cowrie:latest — official Cowrie image
+- [Official Docs] Cowrie Output Events — https://docs.cowrie.org/en/latest/OUTPUT.html
+- [Official Docs] Cowrie Docker — https://docs.cowrie.org/en/latest/DOCKER.html
+- [Official Docs] Socket.IO Redis Adapter — https://socket.io/docs/v4/redis-adapter
+- [Microsoft Sentinel] Cowrie Integration Guide — https://techcommunity.microsoft.com/t5/microsoft-sentinel-blog/cowrie-honeypot-and-its-integration-with-microsoft-sentinel/ba-p/4258349
 
 ### Secondary (MEDIUM confidence)
-- FastAPI 0.110.x -- training data (late 2024), verify with `pip show fastapi`
-- python-socketio 5.x -- training data (late 2024), verify with `pip show python-socketio`
-- Next.js 14 App Router patterns -- training data consistent with current docs
-- Framer Motion 11.x -- training data, verify with `npm show framer-motion`
-- SOC platform feature analysis (Splunk, QRadar, Sentinel) -- training data knowledge
-- Cowrie honeypot integration patterns -- training data from Cowrie GitHub docs
+- [Better Stack] FastAPI Docker Best Practices — production deployment patterns
+- [Medium] FastAPI + Socket.IO Integration — ASGIApp wrapper pattern
+- [PhoenixNAP] Let's Encrypt Nginx Guide — HTTPS configuration
+- [AmbientNode] Running a Cowrie Honeypot: Data and Findings — real attack statistics
 
-### Tertiary (LOW confidence)
-- Specific patch versions (0.110.0, 0.27.0, 5.11.0, etc.) -- single source, needs validation
-- Tailwind CSS 3.4.x exact version -- training data from late 2024, verify
-- ip-api.com rate limits and caching behavior -- unverified during research
+### Tertiary (LOW confidence — needs validation during implementation)
+- Community Docker Compose examples — verify against current best practices
+- Blog tutorials for Nginx WebSocket — test with actual Socket.IO client
 
 ---
-
-*Research completed: 2026-03-24*
+*Research completed: 2026-03-26*
 *Ready for roadmap: yes*
