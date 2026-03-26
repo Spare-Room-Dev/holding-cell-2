@@ -26,10 +26,23 @@ app = FastAPI(
 # Per BACK-02: python-socketio AsyncServer with CORS for localhost:3000
 # Per D-04: CORS allows localhost:3000 only (development)
 # Note: cors_credentials=True required for WebSocket-only transport
-# Allow both localhost and 127.0.0.1 origins
+# Note: Using callable for cors_allowed_origins because list-based validation
+# doesn't work correctly with WebSocket-only transport in python-engineio.
+# See: https://github.com/miguelgrinberg/python-socketio/discussions/1247
+ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+
+def validate_origin(origin, environ=None):
+    """Validate origin for CORS. Returns True if origin is allowed."""
+    if origin is None:
+        return False
+    # Support both with and without environ argument for compatibility
+    return origin in ALLOWED_ORIGINS
+
+
 sio = socketio.AsyncServer(
     async_mode='asgi',
-    cors_allowed_origins=['http://localhost:3000', 'http://127.0.0.1:3000'],
+    cors_allowed_origins=validate_origin,
     cors_credentials=True,
 )
 
