@@ -18,7 +18,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 ## v1.1 Real Threats (Phases 5-8)
 
 - [x] **Phase 5: Docker Containerization** - Docker Compose orchestrates all services with health checks and volume sharing
-- [ ] **Phase 6: Cowrie Integration** - Real SSH/Telnet attack data flows from Cowrie honeypot to dashboard
+- [x] **Phase 6: Cowrie Integration** - Real SSH/Telnet attack data flows from Cowrie honeypot to dashboard
 - [ ] **Phase 7: Persistence & Analytics** - Last 20 attacks stored, lifetime stats, and top attack analytics
 - [ ] **Phase 8: VPS Deployment & Security** - Public HTTPS access with authentication, firewall, and network isolation
 
@@ -63,7 +63,9 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
   4. Lifetime attack counter shows total attacks since deployment
   5. Top attacking locations displayed (countries by attack count)
   6. Top attack methods displayed (SSH vs Telnet, ports targeted)
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 07-01-PLAN.md — Backend persistence with JSON storage, history event on connect, atomic writes
+- [ ] 07-02-PLAN.md — Frontend analytics UI with CountryList, MethodsPanel, extended StatsPanel
 
 ### Phase 8: VPS Deployment & Security
 **Goal**: Dashboard accessible publicly via HTTPS with proper authentication and network security
@@ -87,7 +89,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 | 3. Animated Prisoners | 2/2 | Complete | 2026-03-25 |
 | 4. Polish | 0/3 | In Progress | - |
 | 5. Docker Containerization | 2/2 | Complete | 2026-03-26 |
-| 6. Cowrie Integration | 0/3 | Not started | - |
+| 6. Cowrie Integration | 3/3 | Complete | 2026-03-26 |
 | 7. Persistence Layer | 0/2 | Not started | - |
 | 8. VPS Deployment & Security | 0/3 | Not started | - |
 
@@ -97,5 +99,6 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 *v1.1 Real Threats added: 2026-03-26*
 *Phase 5 planned: 2026-03-26*
 *Phase 6 planned: 2026-03-26*
+*Phase 7 planned: 2026-03-26*
 *Granularity: coarse (4 phases per milestone)*
 *Coverage: 20/20 v1.1 requirements mapped*
