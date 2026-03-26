@@ -28,10 +28,10 @@
 
 ### Docker Containerization
 
-- [ ] **DEPLOY-01**: Docker Compose orchestrates all services (Cowrie, Backend, Frontend, Nginx)
+- [x] **DEPLOY-01**: Docker Compose orchestrates all services (Cowrie, Backend, Frontend, Nginx)
 - [x] **DEPLOY-02**: Services restart automatically via Docker health checks
-- [ ] **DEPLOY-03**: Cowrie logs accessible to backend via shared Docker volume
-- [ ] **DEPLOY-04**: Cowrie runs as non-root user with network isolation from app services
+- [x] **DEPLOY-03**: Cowrie logs accessible to backend via shared Docker volume
+- [x] **DEPLOY-04**: Cowrie runs as non-root user with network isolation from app services
 
 ### VPS Deployment & Security
 
@@ -57,10 +57,10 @@
 | STAT-01 | Phase 7 | Pending |
 | STAT-02 | Phase 7 | Pending |
 | STAT-03 | Phase 7 | Pending |
-| DEPLOY-01 | Phase 5 | Pending |
+| DEPLOY-01 | Phase 5 | Complete |
 | DEPLOY-02 | Phase 5 | Complete |
-| DEPLOY-03 | Phase 5 | Pending |
-| DEPLOY-04 | Phase 5 | Pending |
+| DEPLOY-03 | Phase 5 | Complete |
+| DEPLOY-04 | Phase 5 | Complete |
 | SEC-01 | Phase 8 | Pending |
 | SEC-02 | Phase 8 | Pending |
 | SEC-03 | Phase 8 | Pending |

@@ -35,7 +35,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
   4. Cowrie runs as non-root user with network isolation from app services
 **Plans**: 2 plans
 - [x] 05-01-PLAN.md — Create Dockerfiles for backend/frontend and nginx config with WebSocket proxy
-- [ ] 05-02-PLAN.md — Create docker-compose.yml with 4 services, 2 networks, named volumes, health checks
+- [x] 05-02-PLAN.md — Create docker-compose.yml with 4 services, 2 networks, named volumes, health checks
 
 ### Phase 6: Cowrie Integration
 **Goal**: Real SSH/Telnet attacks flow from Cowrie honeypot to frontend dashboard in real-time
