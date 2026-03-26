@@ -29,11 +29,13 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 **Depends on**: Phase 4 (v1.0 complete)
 **Requirements**: DEPLOY-01, DEPLOY-02, DEPLOY-03, DEPLOY-04
 **Success Criteria** (what must be TRUE):
-  1. User can run `docker-compose up` and all services start (Cowrie, Backend, Frontend, Nginx)
+  1. User can run `docker compose up` and all services start (Cowrie, Backend, Frontend, Nginx)
   2. Cowrie JSON logs are readable by backend via shared Docker volume
   3. Services restart automatically when they fail (health checks configured)
   4. Cowrie runs as non-root user with network isolation from app services
-**Plans**: TBD
+**Plans**: 2 plans
+- [ ] 05-01-PLAN.md — Create Dockerfiles for backend/frontend and nginx config with WebSocket proxy
+- [ ] 05-02-PLAN.md — Create docker-compose.yml with 4 services, 2 networks, named volumes, health checks
 
 ### Phase 6: Cowrie Integration
 **Goal**: Real SSH/Telnet attacks flow from Cowrie honeypot to frontend dashboard in real-time
@@ -90,5 +92,6 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 
 *Roadmap created: 2026-03-24*
 *v1.1 Real Threats added: 2026-03-26*
+*Phase 5 planned: 2026-03-26*
 *Granularity: coarse (4 phases per milestone)*
 *Coverage: 20/20 v1.1 requirements mapped*
