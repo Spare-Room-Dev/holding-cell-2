@@ -25,9 +25,12 @@ app = FastAPI(
 
 # Per BACK-02: python-socketio AsyncServer with CORS for localhost:3000
 # Per D-04: CORS allows localhost:3000 only (development)
+# Note: cors_credentials=True required for WebSocket-only transport
+# Allow both localhost and 127.0.0.1 origins
 sio = socketio.AsyncServer(
     async_mode='asgi',
-    cors_allowed_origins=['http://localhost:3000'],
+    cors_allowed_origins=['http://localhost:3000', 'http://127.0.0.1:3000'],
+    cors_credentials=True,
 )
 
 # Per Pattern 1: ASGIApp wrapper to combine FastAPI and Socket.io
