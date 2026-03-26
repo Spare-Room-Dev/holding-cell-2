@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Real Threats
-status: Defining requirements
+status: Roadmap created, awaiting approval
 last_updated: "2026-03-26T00:00:00.000Z"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -22,8 +22,11 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: 5 - Docker Containerization (awaiting Phase 4 completion)
 Plan: —
+Status: Roadmap created, not started
+
+**Note:** Phase 4 (Polish) from v1.0 is in progress. v1.1 phases (5-8) will begin after Phase 4 completes.
 
 ## Performance Metrics
 
@@ -54,21 +57,32 @@ Plan: —
 ### Decisions
 
 Decisions are logged in PROJECT.md Key Decisions table.
-Milestone v1.1 decisions will be added as phases complete.
+
+**v1.1 Key Decisions (planned):**
+- Docker Compose for orchestration — single-command deployment, reproducible infrastructure
+- Cowrie OT persona — mining/industrial site persona for Perth OT jobs
+- File-watching pattern — backend tails Cowrie JSON logs via shared Docker volume
+- Network isolation — Cowrie on isolated network from app services
 
 ### Pending Todos
 
-None yet.
+- [ ] Complete Phase 4 (Polish): 04-02, 04-03 plans remaining
+- [ ] Start v1.1 after Phase 4 transition
 
 ### Blockers/Concerns
 
-None yet.
+None currently.
 
 ## Session Continuity
 
 Last session: 2026-03-26
 Resume file: None
 
+**Next Actions:**
+1. Complete Phase 4 (Polish)
+2. Transition to v1.1
+3. Begin Phase 5 (Docker Containerization)
+
 ---
 
-*State last updated: 2026-03-26 — Milestone v1.1 Real Threats started*
+*State last updated: 2026-03-26 — v1.1 roadmap created, 4 phases defined*
