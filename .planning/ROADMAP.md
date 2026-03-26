@@ -17,7 +17,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 
 ## v1.1 Real Threats (Phases 5-8)
 
-- [ ] **Phase 5: Docker Containerization** - Docker Compose orchestrates all services with health checks and volume sharing
+- [x] **Phase 5: Docker Containerization** - Docker Compose orchestrates all services with health checks and volume sharing
 - [ ] **Phase 6: Cowrie Integration** - Real SSH/Telnet attack data flows from Cowrie honeypot to dashboard
 - [ ] **Phase 7: Persistence & Analytics** - Last 20 attacks stored, lifetime stats, and top attack analytics
 - [ ] **Phase 8: VPS Deployment & Security** - Public HTTPS access with authentication, firewall, and network isolation
@@ -47,7 +47,10 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
   3. Session events are correlated (connect, login, commands, close) by session ID
   4. All 5 archetypes classified correctly from real attack fingerprints (HASSH + command patterns)
   5. GeoIP country data displays correctly for attacker IP addresses
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 06-01-PLAN.md — Cowrie OT persona config + GeoIP database mount setup
+- [ ] 06-02-PLAN.md — Cowrie reader module with session correlation + classification
+- [ ] 06-03-PLAN.md — Backend integration, disable fake generator, wire real data flow
 
 ### Phase 7: Persistence & Analytics
 **Goal**: All visitors see the same attack history with lifetime stats and top attack analytics
@@ -83,7 +86,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 | 2. Core Visualization | 3/3 | Complete | 2026-03-25 |
 | 3. Animated Prisoners | 2/2 | Complete | 2026-03-25 |
 | 4. Polish | 0/3 | In Progress | - |
-| 5. Docker Containerization | 0/2 | Not started | - |
+| 5. Docker Containerization | 2/2 | Complete | 2026-03-26 |
 | 6. Cowrie Integration | 0/3 | Not started | - |
 | 7. Persistence Layer | 0/2 | Not started | - |
 | 8. VPS Deployment & Security | 0/3 | Not started | - |
@@ -93,5 +96,6 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 *Roadmap created: 2026-03-24*
 *v1.1 Real Threats added: 2026-03-26*
 *Phase 5 planned: 2026-03-26*
+*Phase 6 planned: 2026-03-26*
 *Granularity: coarse (4 phases per milestone)*
 *Coverage: 20/20 v1.1 requirements mapped*
