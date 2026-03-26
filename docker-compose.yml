@@ -43,8 +43,10 @@ services:
       dockerfile: Dockerfile
     environment:
       - COWRIE_LOG_PATH=${COWRIE_LOG_PATH:-/var/log/cowrie}
+      - GEOIP_DB_PATH=${GEOIP_DB_PATH:-/geoip/GeoLite2-Country.mmdb}
     volumes:
       - cowrie-logs:${COWRIE_LOG_PATH:-/var/log/cowrie}:ro
+      - ./geoip:/geoip:ro
     networks:
       - app-network
       # NOT cowrie-network - backend only accesses logs via volume (per D-06, D-08)
@@ -65,6 +67,8 @@ services:
       - "${COWRIE_TELNET_PORT:-2323}:2223"
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
+      - ./cowrie-config/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
+      - ./cowrie-config/honeyfs:/cowrie/cowrie-git/honeyfs:ro
     networks:
       - cowrie-network
       # ONLY cowrie-network - isolated from app services (per D-05, D-06, D-08)
