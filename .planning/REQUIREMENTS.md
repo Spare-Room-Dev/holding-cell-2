@@ -11,11 +11,11 @@
 
 ### Cowrie Integration
 
-- [ ] **COW-01**: Cowrie honeypot configured as mining/industrial site persona (motd, filesystem, usernames reflect OT environment)
+- [x] **COW-01**: Cowrie honeypot configured as mining/industrial site persona (motd, filesystem, usernames reflect OT environment)
 - [ ] **COW-02**: Attack data flows from Cowrie JSON logs to backend via Socket.io in real-time
 - [ ] **COW-03**: Session correlation groups related events (connect, login, commands, close) by session ID
 - [ ] **COW-04**: All 5 archetypes classified from real attack fingerprints (HASSH + command patterns)
-- [ ] **COW-05**: GeoIP country data derived from attacker IP addresses
+- [x] **COW-05**: GeoIP country data derived from attacker IP addresses
 
 ### Persistence & Analytics
 
@@ -46,11 +46,11 @@
 
 | REQ-ID | Phase | Status |
 |--------|-------|--------|
-| COW-01 | Phase 6 | Pending |
+| COW-01 | Phase 6 | Complete |
 | COW-02 | Phase 6 | Pending |
 | COW-03 | Phase 6 | Pending |
 | COW-04 | Phase 6 | Pending |
-| COW-05 | Phase 6 | Pending |
+| COW-05 | Phase 6 | Complete |
 | STORE-01 | Phase 7 | Pending |
 | STORE-02 | Phase 7 | Pending |
 | STORE-03 | Phase 7 | Pending |
