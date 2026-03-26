@@ -1,0 +1,16 @@
+# Mining/Industrial OT usernames
+# Format: username:uid:password
+# * = wildcard password (accepts anything)
+# ! = deny this password
+
+root:x:!root
+root:x:!123456
+root:x:!password
+root:x:*
+haulop:x:*
+dispatch:x:*
+supervisor:x:*
+mechanic:x:*
+service:x:*
+operator:x:*
+admin:x:*
