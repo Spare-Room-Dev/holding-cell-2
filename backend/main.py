@@ -3,17 +3,17 @@ FastAPI + python-socketio ASGI server for The Holding Cell.
 
 Per BACK-01: FastAPI server runs on port 8000 with async support
 Per BACK-02: python-socketio AsyncServer handles WebSocket connections
-Per BACK-03: AttackGenerator produces fake attack events every 3-8 seconds
-Per BACK-09: Socket emit failures logged with try/catch, no crash
+Per D-07: CowrieReader processes real attacks from Cowrie honeypot
+Per D-09: Socket emit failures logged with try/catch, no crash
 """
 
 import asyncio
-import random
 import socketio
 from fastapi import FastAPI
 import uvicorn
 
-from attack_generator import generate_fake_attack
+from cowrie_reader import CowrieReader
+from geoip_service import GeoIPService
 
 
 # Per BACK-01: FastAPI app initialization
@@ -30,6 +30,11 @@ app = FastAPI(
 # doesn't work correctly with WebSocket-only transport in python-engineio.
 # See: https://github.com/miguelgrinberg/python-socketio/discussions/1247
 ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+
+# Per D-20/D-21: GeoIP service for country lookups
+# Per D-07: CowrieReader replaces attack_generator
+geoip_service = None
+cowrie_reader = None
 
 
 def validate_origin(origin, environ=None):
@@ -75,38 +80,38 @@ async def disconnect(sid: str) -> None:
     print(f"[Socket.IO] Client disconnected: {sid}")
 
 
-# Per BACK-03: Background attack emitter task
-async def attack_emitter() -> None:
+# Per D-07: CowrieReader replaces attack_generator for real attack data
+# Per D-08: Fake attack generator disabled entirely
+# Per D-12: Throttled emission (1.5s buffer) handled in CowrieReader
+# Per D-13: Socket.io still uses same attack_event channel
+async def cowrie_emitter() -> None:
     """
-    Background task that emits fake attack events every 3-8 seconds.
+    Background task that watches Cowrie logs and emits real attacks.
 
-    Per D-08: Attack generator emits every 3-8 seconds (randomized interval)
-    Per BACK-09: All emit calls wrapped in try/except to prevent crashes
+    Replaces the fake attack_emitter with real honeypot data.
     """
-    print("[AttackEmitter] Starting attack emitter background task...")
+    print("[CowrieEmitter] Starting Cowrie log watcher...")
 
-    # Wait a moment for server to be ready
-    await asyncio.sleep(1)
+    # Initialize GeoIP service
+    global geoip_service
+    geoip_service = GeoIPService()
 
-    while True:
+    # Initialize Cowrie reader
+    global cowrie_reader
+    cowrie_reader = CowrieReader(geoip_service=geoip_service)
+
+    # Process existing log entries first
+    await cowrie_reader.process_existing_log()
+
+    # Define emit callback for Socket.io
+    async def emit_attack(attack_dict: dict) -> None:
         try:
-            # Generate a fake attack event
-            attack = generate_fake_attack()
-
-            # Per BACK-02: Use await sio.emit() (async) not sio.emit() (sync)
-            # Per BACK-09: Wrap emit in try/except to prevent crashes
-            try:
-                await sio.emit('attack_event', attack.model_dump())
-            except Exception as emit_error:
-                # Log error but continue - don't crash the server
-                print(f"[AttackEmitter] Failed to emit attack: {emit_error}")
-
+            await sio.emit('attack_event', attack_dict)
         except Exception as e:
-            print(f"[AttackEmitter] Error generating attack: {e}")
+            print(f"[CowrieEmitter] Failed to emit attack: {e}")
 
-        # Per D-08: Randomized interval between 3-8 seconds
-        delay = random.uniform(3, 8)
-        await asyncio.sleep(delay)
+    # Start watching for new entries
+    await cowrie_reader.watch_log(emit_callback=emit_attack)
 
 
 # Per BACK-01: Health check endpoint
@@ -124,9 +129,9 @@ async def health_check() -> dict:
 # Per Pattern 1: Startup event to create background task
 @app.on_event('startup')
 async def startup() -> None:
-    """Create background attack emitter task on server startup."""
-    asyncio.create_task(attack_emitter())
-    print("[FastAPI] Server started, attack emitter running")
+    """Start Cowrie log watcher on server startup."""
+    asyncio.create_task(cowrie_emitter())
+    print("[FastAPI] Server started, Cowrie log watcher running")
 
 
 # Per BACK-01: Main block - uvicorn runs combined app on port 8000
