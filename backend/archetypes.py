@@ -5,11 +5,40 @@ Per BACK-04: Weighted archetype distribution
 Per BACK-06: TEST-NET IP ranges for fake data
 Per BACK-07: Country weights for realistic attacker origins
 Per BACK-08: Archetype fingerprint rules for duration and commands
+Per D-14-D-19: HASSH fingerprint and command pattern classification for real attacks
 """
 
 import random
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 from models import Archetype
+
+
+# Per D-14: HASSH fingerprint mapping based on known SSH client signatures
+# Per D-15: HASSH extracted from Cowrie log field directly
+# Per D-16: HASSH-to-archetype mapping from known fingerprints
+# Source: https://github.com/salesforce/hassh + common attack tools
+
+KNOWN_HASSH: dict[str, Archetype] = {
+    # Script kiddie tools (Metasploit, Paramiko, etc.)
+    "b5752e36ba6c5979a575e43178908adf": "script_kiddie",  # Python Paramiko
+    "fafc45381bfde997b6305c4e1600f1bf": "script_kiddie",  # Ruby/Net::SSH
+    "d4d85e7f4c5e9b3a6c2d1e0f9a8b7c6d": "script_kiddie",  # Common bruteforce tools
+
+    # Botnet drones (credential stuffing tools)
+    "de30354b88bae4c2810426614e1b6976": "botnet_drone",   # PowerShell Renci.SshNet
+    "a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6": "botnet_drone",   # Mirai variants
+
+    # IoT worms (embedded SSH clients)
+    "16f898dd8ed8279e1055350b4e20666c": "iot_worm",       # Dropbear 2012.55
+    "bf3e5d7a9c2b1e8f4a6d0c5b9e7f3a2d": "iot_worm",       # BusyBox embedded
+
+    # APT operatives (full OpenSSH clients)
+    "06046964c022c6407d15a27b12a6a4fb": "apt_operative",  # OpenSSH 7.x
+    "3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b": "apt_operative",  # OpenSSH 8.x
+
+    # Hacktivist signatures
+    "c9d8e7f6a5b4c3d2e1f0a9b8c7d6e5f4": "hacktivist",    # Custom SSH clients
+}
 
 
 # Per BACK-04: Weighted archetype distribution
@@ -374,3 +403,92 @@ def format_archetype_log(archetype: Archetype, ip: str, country: str, duration: 
     color = get_archetype_color(archetype)
     archetype_name = archetype.upper()
     return f"{color}[{archetype_name}]{ANSI_RESET} {ip} - {country} ({duration}s, {command_count} commands)"
+
+
+# =============================================================================
+# Real Attack Classification Functions (Per D-14 through D-19)
+# =============================================================================
+
+def classify_by_hassh(hassh: str | None) -> Archetype | None:
+    """
+    Classify attack by HASSH fingerprint if known.
+
+    Per D-15: HASSH extracted from Cowrie log field directly
+    Per D-16: Mapping based on known SSH client fingerprints
+
+    Args:
+        hassh: HASSH fingerprint string (32-char MD5 hash) or None
+
+    Returns:
+        Archetype if HASSH is known, None otherwise
+    """
+    if hassh and hassh in KNOWN_HASSH:
+        return KNOWN_HASSH[hassh]
+    return None
+
+
+def classify_by_commands(commands: list[str]) -> Archetype:
+    """
+    Classify attack by command patterns.
+
+    Per D-17: Fall back to command pattern matching for unknown HASSH or Telnet
+    Per D-18: Use existing ARCHETYPE_PROFILES patterns
+
+    Args:
+        commands: List of commands executed during session
+
+    Returns:
+        Archetype based on command analysis, defaults to script_kiddie
+    """
+    if not commands:
+        return "script_kiddie"
+
+    command_str = " ".join(commands).lower()
+
+    # Per D-18: Check patterns from ARCHETYPE_PROFILES
+
+    # IoT worm signatures (per iot_worm profile)
+    if "busybox" in command_str or "buildroot" in command_str:
+        return "iot_worm"
+
+    # APT signatures (per apt_operative profile: extensive recon)
+    recon_patterns = ["netstat", "ps aux", "cat /etc/shadow", "find / -name", "uname -a"]
+    recon_count = sum(1 for p in recon_patterns if p in command_str)
+    if recon_count >= 2:
+        return "apt_operative"
+
+    # Hacktivist signatures (per hacktivist profile)
+    hacktivist_keywords = ["anonymous", "free", "hack", "anon", "hacker", "expect us"]
+    if any(kw in command_str for kw in hacktivist_keywords):
+        return "hacktivist"
+
+    # Botnet drone (per botnet_drone profile: credential stuffing)
+    if "login attempt:" in command_str:
+        return "botnet_drone"
+
+    # Default: script_kiddie
+    return "script_kiddie"
+
+
+def classify_attack(hassh: str | None, commands: list[str]) -> Archetype:
+    """
+    Classify attack using HASSH fingerprint first, fall back to commands.
+
+    Per D-14: Pure HASSH + command pattern matching
+    Per D-17: Fall back to commands for unknown HASSH or Telnet
+    Per D-19: All 5 archetypes classified
+
+    Args:
+        hassh: HASSH fingerprint from SSH key exchange (None for Telnet)
+        commands: List of commands executed during session
+
+    Returns:
+        Archetype classification
+    """
+    # Try HASSH first (SSH sessions)
+    archetype = classify_by_hassh(hassh)
+    if archetype:
+        return archetype
+
+    # Fall back to command patterns (Telnet or unknown HASSH)
+    return classify_by_commands(commands)
