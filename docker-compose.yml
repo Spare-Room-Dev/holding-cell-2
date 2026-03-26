@@ -47,6 +47,7 @@ services:
     volumes:
       - cowrie-logs:${COWRIE_LOG_PATH:-/var/log/cowrie}:ro
       - ./geoip:/geoip:ro
+      - persistence-data:/data  # Per D-02: Attack history and analytics
     networks:
       - app-network
       # NOT cowrie-network - backend only accesses logs via volume (per D-06, D-08)
@@ -93,3 +94,4 @@ networks:
 volumes:
   frontend-static:  # Static files for nginx to serve
   cowrie-logs:      # Shared logs between Cowrie and backend (per D-03)
+  persistence-data: # Attack history and analytics (per D-02)

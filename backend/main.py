@@ -14,6 +14,7 @@ import uvicorn
 
 from cowrie_reader import CowrieReader
 from geoip_service import GeoIPService
+from persistence import PersistenceManager
 
 
 # Per BACK-01: FastAPI app initialization
@@ -33,8 +34,10 @@ ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
 
 # Per D-20/D-21: GeoIP service for country lookups
 # Per D-07: CowrieReader replaces attack_generator
+# Per STORE-01/STAT-01: Persistence manager for attack history
 geoip_service = None
 cowrie_reader = None
+persistence_manager = None
 
 
 def validate_origin(origin, environ=None):
@@ -61,12 +64,24 @@ async def connect(sid: str, environ: dict, auth: dict) -> None:
     """
     Handle client connection.
 
+    Per D-05: Send history on connect.
+    Per STORE-03: New clients immediately see existing attacks on connect.
+
     Args:
         sid: Socket.io session ID
         environ: WSGI environment dict
         auth: Authentication data from client
     """
     print(f"[Socket.IO] Client connected: {sid}")
+
+    # Per D-05/D-06/D-07: Send history on connect
+    # Per STORE-02: All clients receive same history from in-memory cache
+    if persistence_manager:
+        await sio.emit('attack_history', {
+            'attacks': persistence_manager.get_history(),
+            'lifetime_count': persistence_manager.get_lifetime_count(),
+            'analytics': persistence_manager.get_analytics()
+        }, to=sid)
 
 
 @sio.event
@@ -107,8 +122,12 @@ async def cowrie_emitter() -> None:
     async def emit_attack(attack_dict: dict) -> None:
         try:
             await sio.emit('attack_event', attack_dict)
+            # Per D-03/D-08: Persist immediately after emission
+            # Per STORE-01: Persist every attack for crash recovery
+            if persistence_manager:
+                await persistence_manager.add_attack(attack_dict)
         except Exception as e:
-            print(f"[CowrieEmitter] Failed to emit attack: {e}")
+            print(f"[CowrieEmitter] Failed to emit/persist attack: {e}")
 
     # Start watching for new entries
     await cowrie_reader.watch_log(emit_callback=emit_attack)
@@ -129,9 +148,16 @@ async def health_check() -> dict:
 # Per Pattern 1: Startup event to create background task
 @app.on_event('startup')
 async def startup() -> None:
-    """Start Cowrie log watcher on server startup."""
+    """Start server with persistence and Cowrie log watcher."""
+    global persistence_manager
+
+    # Per D-07: Load history from JSON file into memory on startup
+    persistence_manager = PersistenceManager()
+    await persistence_manager.load()
+
+    # Start Cowrie watcher
     asyncio.create_task(cowrie_emitter())
-    print("[FastAPI] Server started, Cowrie log watcher running")
+    print("[FastAPI] Server started, persistence loaded, Cowrie watcher running")
 
 
 # Per BACK-01: Main block - uvicorn runs combined app on port 8000
