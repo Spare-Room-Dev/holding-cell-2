@@ -1,8 +1,12 @@
 """
-Fake attack data generator for development and testing.
+DEPRECATED: Fake attack generator for development/testing only.
 
-Per BACK-03: AttackGenerator produces fake attack events every 3-8 seconds
-Per D-09: Console logging with colored archetype tags
+This module is NO LONGER USED in production.
+Per D-08: Fake attack generator disabled entirely.
+Per D-07: Real attacks come from cowrie_reader.py.
+
+Kept for reference and local testing without Cowrie.
+To re-enable for testing, set DISABLED = False before importing.
 """
 
 import random
@@ -15,6 +19,10 @@ from archetypes import (
     generate_raw_log,
     format_archetype_log,
 )
+
+
+# Module disabled flag - prevents accidental usage in production
+DISABLED = True
 
 
 # Common ports for attack simulations
@@ -88,6 +96,9 @@ def generate_fake_attack() -> AttackEvent:
     """
     Generate a complete fake AttackEvent ready for Socket.io emission.
 
+    DEPRECATED: Use CowrieReader for real attacks.
+    This function is kept for testing purposes only.
+
     Per BACK-03: Generates fake attack data with weighted archetype distribution
     Per BACK-04: Weighted archetype distribution (botnet_drone: 50%, etc.)
     Per BACK-05: AttackEvent contains all required fields
@@ -97,7 +108,17 @@ def generate_fake_attack() -> AttackEvent:
 
     Returns:
         AttackEvent: A complete attack event ready for emission
+
+    Raises:
+        RuntimeError: If module is DISABLED (production mode)
     """
+    if DISABLED:
+        raise RuntimeError(
+            "Fake attack generator is DISABLED. "
+            "Use CowrieReader for real attack data. "
+            "To re-enable for testing, set attack_generator.DISABLED = False"
+        )
+
     # Step 1: Choose archetype using weighted distribution
     archetype: Archetype = choose_archetype()
 
