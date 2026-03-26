@@ -50,7 +50,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 **Plans**: 3 plans
 - [x] 06-01-PLAN.md — Cowrie OT persona config + GeoIP database mount setup
 - [x] 06-02-PLAN.md — Cowrie reader module with session correlation + classification
-- [ ] 06-03-PLAN.md — Backend integration, disable fake generator, wire real data flow
+- [x] 06-03-PLAN.md — Backend integration, disable fake generator, wire real data flow
 
 ### Phase 7: Persistence & Analytics
 **Goal**: All visitors see the same attack history with lifetime stats and top attack analytics
