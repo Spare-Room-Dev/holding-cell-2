@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: Complete
 status: executing
-last_updated: "2026-03-26T13:17:45.187Z"
+last_updated: "2026-03-26T13:19:41.779Z"
 progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 17
-  completed_plans: 15
+  completed_plans: 16
 ---
 
 # Project State
@@ -23,7 +23,7 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 06 (cowrie-integration) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Executing Phase 06
 
 **Note:** Phase 4 (Polish) from v1.0 is in progress. v1.1 phases (5-8) will begin after Phase 4 completes.
@@ -54,6 +54,7 @@ Status: Executing Phase 06
 | Phase 05 P01 | 4 | 3 tasks | 4 files |
 | Phase 05 P02 | 2 | 2 tasks | 3 files |
 | Phase 06-cowrie-integration P01 | 2min | 3 tasks | 5 files |
+| Phase 06-cowrie-integration P02 | 4min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,9 @@ Decisions are logged in PROJECT.md Key Decisions table.
 - [Phase 05]: node:20-alpine + nginx:alpine for minimal frontend image size
 - [Phase 05]: 24-hour WebSocket timeouts to prevent connection drops
 - [Phase 06-cowrie-integration]: Mining/industrial OT persona (HaulMax Fleet Management) chosen for Cowrie honeypot
+- [Phase 06-cowrie-integration]: watchfiles.awatch() for native async log watching (per D-05)
+- [Phase 06-cowrie-integration]: Emit attacks only on cowrie.session.closed for complete data (per D-09)
+- [Phase 06-cowrie-integration]: 1.5 second throttle for emission to prevent UI flooding (per D-12)
 
 ### Pending Todos
 
@@ -83,7 +87,7 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-03-26T13:17:45.185Z
+Last session: 2026-03-26T13:19:25.367Z
 Resume file: None
 
 **Next Actions:**
