@@ -35,3 +35,15 @@ export interface AttackEvent {
   /** Original fake log line */
   rawLog: string;
 }
+
+export interface Analytics {
+  countries: Record<string, number>;  // countryCode -> count
+  protocols: Record<string, number>;  // SSH/TELNET -> count
+  ports: Record<string, number>;       // port number -> count
+}
+
+export interface AttackHistoryPayload {
+  attacks: AttackEvent[];
+  lifetime_count: number;
+  analytics: Analytics;
+}

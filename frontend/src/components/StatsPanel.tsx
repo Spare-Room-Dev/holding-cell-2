@@ -3,6 +3,8 @@
 import { useMemo } from 'react';
 import { useSocket } from '@/context/SocketContext';
 import { CounterBox } from './CounterBox';
+import { CountryList } from './CountryList';
+import { MethodsPanel } from './MethodsPanel';
 import type { Archetype } from '@/types/attack';
 
 const ARCHETYPE_LABELS: Record<Archetype, string> = {
@@ -26,19 +28,45 @@ export function StatsPanel() {
     return { total, byArchetype };
   }, [state.attacks]);
 
-  return (
-    <div className="flex flex-row gap-md flex-wrap">
-      {/* Total Attacks counter */}
-      <CounterBox label="Total" value={counts.total} />
+  // Derive top 5 countries from analytics (per D-13)
+  const topCountries = useMemo(() => {
+    const entries = Object.entries(state.analytics.countries);
+    return entries
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5) as [string, number][];
+  }, [state.analytics.countries]);
 
-      {/* Archetype counters */}
-      {Object.entries(ARCHETYPE_LABELS).map(([archetype, label]) => (
-        <CounterBox
-          key={archetype}
-          label={label}
-          value={counts.byArchetype[archetype as Archetype] || 0}
+  // Derive top 5 ports from analytics (per D-15)
+  const topPorts = useMemo(() => {
+    const entries = Object.entries(state.analytics.ports);
+    return entries
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5) as [string, number][];
+  }, [state.analytics.ports]);
+
+  return (
+    <div className="flex flex-col gap-md">
+      {/* Row 1: Archetype counters (existing) */}
+      <div className="flex flex-row gap-md flex-wrap">
+        <CounterBox label="Total" value={counts.total} />
+        {Object.entries(ARCHETYPE_LABELS).map(([archetype, label]) => (
+          <CounterBox
+            key={archetype}
+            label={label}
+            value={counts.byArchetype[archetype as Archetype] || 0}
+          />
+        ))}
+      </div>
+
+      {/* Row 2: Analytics row (new, per D-19, D-20) */}
+      <div className="flex flex-row gap-md flex-wrap">
+        <CounterBox label="Lifetime" value={state.lifetimeCount} />
+        <CountryList countries={topCountries} />
+        <MethodsPanel
+          protocols={state.analytics.protocols}
+          ports={topPorts}
         />
-      ))}
+      </div>
     </div>
   );
 }
