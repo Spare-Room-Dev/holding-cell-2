@@ -3,7 +3,68 @@
 **Defined:** 2026-03-24
 **Core Value:** A visually impressive, working real-time dashboard demonstrating SOC operations and threat intelligence skills through a distinctive arcade-meets-terminal aesthetic.
 
-## v1 Requirements
+---
+
+## v1.1 Requirements: Real Threats
+
+**Milestone Goal:** Deploy as public-facing demo with live Cowrie honeypot data, mining/industrial persona for Perth OT cybersecurity positions, and shared attack history.
+
+### Cowrie Integration
+
+- [ ] **COW-01**: Cowrie honeypot configured as mining/industrial site persona (motd, filesystem, usernames reflect OT environment)
+- [ ] **COW-02**: Attack data flows from Cowrie JSON logs to backend via Socket.io in real-time
+- [ ] **COW-03**: Session correlation groups related events (connect, login, commands, close) by session ID
+- [ ] **COW-04**: All 5 archetypes classified from real attack fingerprints (HASSH + command patterns)
+- [ ] **COW-05**: GeoIP country data derived from attacker IP addresses
+
+### Persistence
+
+- [ ] **STORE-01**: Last 20 attacks stored persistently (survives server restart)
+- [ ] **STORE-02**: All visitors see the same attack history (shared state)
+- [ ] **STORE-03**: New visitors see existing attacks immediately on connect
+
+### Docker Containerization
+
+- [ ] **DEPLOY-01**: Docker Compose orchestrates all services (Cowrie, Backend, Frontend, Nginx)
+- [ ] **DEPLOY-02**: Services restart automatically via Docker health checks
+- [ ] **DEPLOY-03**: Cowrie logs accessible to backend via shared Docker volume
+- [ ] **DEPLOY-04**: Cowrie runs as non-root user with network isolation from app services
+
+### VPS Deployment & Security
+
+- [ ] **SEC-01**: Dashboard protected with authentication (password protection or IP whitelist)
+- [ ] **SEC-02**: HTTPS via Let's Encrypt with auto-renewal
+- [ ] **SEC-03**: Nginx WebSocket configuration prevents 60-second disconnects
+- [ ] **SEC-04**: Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
+- [ ] **SEC-05**: No hardcoded secrets; environment files for sensitive configuration
+- [ ] **SEC-06**: Cowrie network isolated from app network (no cross-talk between honeypot and dashboard)
+
+### v1.1 Traceability
+
+| REQ-ID | Phase | Status |
+|--------|-------|--------|
+| COW-01 | TBD | - |
+| COW-02 | TBD | - |
+| COW-03 | TBD | - |
+| COW-04 | TBD | - |
+| COW-05 | TBD | - |
+| STORE-01 | TBD | - |
+| STORE-02 | TBD | - |
+| STORE-03 | TBD | - |
+| DEPLOY-01 | TBD | - |
+| DEPLOY-02 | TBD | - |
+| DEPLOY-03 | TBD | - |
+| DEPLOY-04 | TBD | - |
+| SEC-01 | TBD | - |
+| SEC-02 | TBD | - |
+| SEC-03 | TBD | - |
+| SEC-04 | TBD | - |
+| SEC-05 | TBD | - |
+| SEC-06 | TBD | - |
+
+---
+
+## v1 Requirements (Complete)
 
 ### Backend Core
 
@@ -73,40 +134,30 @@
 - [x] **DEV-04**: backend/requirements.txt lists all Python dependencies
 - [x] **DEV-05**: frontend/package.json lists all Node dependencies
 
-## v2 Requirements
+---
 
-### Honeypot Integration
+## Future Requirements (Deferred)
 
-- **HONE-01**: Cowrie honeypot log tailer (Weekend 2)
-- **HONE-02**: AttackSource abstraction interface for swappable data sources
-- **HONE-03**: IP anonymization at backend boundary before data reaches frontend
+- GeoIP enrichment with MaxMind GeoIP2 database
+- Attack statistics persistence beyond last 20 attacks
+- Multi-honeypot aggregation
+- Historical analysis / time-series charts
+- TTY session replay
 
-### Enrichment
-
-- **ENRH-01**: Shodan enrichment on prisoner hover (Weekend 3)
-- **ENRH-02**: Per-IP cache with TTL for Shodan responses
-- **ENRH-03**: Shodan Radar widget (fixed top-right, polling every 60s)
-
-### Polish
-
-- **POLY-01**: Demo speed mode (1-2s attack cadence)
-- **POLY-02**: Persistent attacker identity across sessions
-- **POLY-03**: Attack pattern indicator strip
+---
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| Real Cowrie honeypot | Weekend 2 — validates concept with real data |
-| VPS deployment | Weekend 2 — operational complexity beyond MVP |
-| Full SIEM integration | Anti-feature — undermines portfolio demo purpose |
-| AI/ML threat scoring | Anti-feature — adds complexity without visual value |
-| World map visualization | Anti-feature — category convention, not this product's identity |
-| Multi-honeypot aggregation | Anti-feature — single honeypot sufficient for portfolio |
-| Docker/Ansible pipeline | Weekend 2+ — premature for MVP stage |
-| PerthMiners disguise | Weekend 2 — SSH banner + fake commands |
+| Multi-provider deployment | Single VPS simpler for portfolio demo |
+| Persistent attacker identity | Beyond v1.1 scope |
+| Actual malicious activity storage | Security/legal concerns |
+| Long-term analytics | Beyond v1.1 scope |
 
-## Traceability
+---
+
+## v1 Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
@@ -155,11 +206,11 @@
 | DEV-04 | Phase 1 | Complete |
 | DEV-05 | Phase 1 | Complete |
 
-**Coverage:**
+**v1 Coverage:**
 - v1 requirements: 38 total
 - Mapped to phases: 38
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-24*
-*Last updated: 2026-03-24 after roadmap creation*
+*Last updated: 2026-03-26 — Milestone v1.1 Real Threats started*
