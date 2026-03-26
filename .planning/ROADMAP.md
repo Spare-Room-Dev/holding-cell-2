@@ -34,7 +34,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
   3. Services restart automatically when they fail (health checks configured)
   4. Cowrie runs as non-root user with network isolation from app services
 **Plans**: 2 plans
-- [ ] 05-01-PLAN.md — Create Dockerfiles for backend/frontend and nginx config with WebSocket proxy
+- [x] 05-01-PLAN.md — Create Dockerfiles for backend/frontend and nginx config with WebSocket proxy
 - [ ] 05-02-PLAN.md — Create docker-compose.yml with 4 services, 2 networks, named volumes, health checks
 
 ### Phase 6: Cowrie Integration

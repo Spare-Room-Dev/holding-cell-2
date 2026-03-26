@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Real Threats
-status: Roadmap created, awaiting approval
-last_updated: "2026-03-26T00:00:00.000Z"
+milestone: v1.0
+milestone_name: Complete
+status: executing
+last_updated: "2026-03-26T11:51:49.586Z"
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 5
+  completed_phases: 4
+  total_plans: 14
+  completed_plans: 13
 ---
 
 # Project State
@@ -18,13 +18,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** A visually impressive, working real-time dashboard demonstrating SOC operations and threat intelligence skills through a distinctive arcade-meets-terminal aesthetic.
-**Current focus:** Milestone v1.1 — Real Threats (Cowrie integration + VPS deployment)
+**Current focus:** Phase 05 — docker-containerization
 
 ## Current Position
 
-Phase: 5 - Docker Containerization (awaiting Phase 4 completion)
-Plan: —
-Status: Roadmap created, not started
+Phase: 05 (docker-containerization) — EXECUTING
+Plan: 2 of 2
+Status: Executing Phase 05
 
 **Note:** Phase 4 (Polish) from v1.0 is in progress. v1.1 phases (5-8) will begin after Phase 4 completes.
 
@@ -51,6 +51,7 @@ Status: Roadmap created, not started
 - Trend: stable execution
 
 *Updated after each plan completion*
+| Phase 05 P01 | 4 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -59,10 +60,14 @@ Status: Roadmap created, not started
 Decisions are logged in PROJECT.md Key Decisions table.
 
 **v1.1 Key Decisions (planned):**
+
 - Docker Compose for orchestration — single-command deployment, reproducible infrastructure
 - Cowrie OT persona — mining/industrial site persona for Perth OT jobs
 - File-watching pattern — backend tails Cowrie JSON logs via shared Docker volume
 - Network isolation — Cowrie on isolated network from app services
+- [Phase 05]: python:3.11-slim for minimal backend image size
+- [Phase 05]: node:20-alpine + nginx:alpine for minimal frontend image size
+- [Phase 05]: 24-hour WebSocket timeouts to prevent connection drops
 
 ### Pending Todos
 
@@ -75,10 +80,11 @@ None currently.
 
 ## Session Continuity
 
-Last session: 2026-03-26
+Last session: 2026-03-26T11:51:49.580Z
 Resume file: None
 
 **Next Actions:**
+
 1. Complete Phase 4 (Polish)
 2. Transition to v1.1
 3. Begin Phase 5 (Docker Containerization)
