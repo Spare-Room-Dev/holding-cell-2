@@ -1,0 +1,91 @@
+# Docker Compose orchestration for The Holding Cell
+# Per D-01: Four services - nginx, frontend, backend, cowrie
+# Per D-05: Two networks - app-network (nginx/frontend/backend) and cowrie-network (isolated)
+# Per D-13: All services restart automatically
+
+version: '3.8'
+
+services:
+  # Nginx reverse proxy (per D-02)
+  # Handles all external traffic, routes HTTP/WebSocket to backend, serves frontend static files
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "${FRONTEND_PORT:-80}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - frontend-static:/usr/share/nginx/html:ro
+    networks:
+      - app-network
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # Frontend - Next.js static build (per D-03)
+  # Builds static files, nginx serves them directly (no Next.js server in production)
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    volumes:
+      - frontend-static:/app/out
+    networks:
+      - app-network
+    restart: unless-stopped
+    # No health check needed - static files served by nginx (per D-11)
+
+  # Backend - FastAPI + Socket.io (per D-04)
+  # Runs on port 8000 internally, nginx proxies to it
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      - COWRIE_LOG_PATH=${COWRIE_LOG_PATH:-/var/log/cowrie}
+    volumes:
+      - cowrie-logs:${COWRIE_LOG_PATH:-/var/log/cowrie}:ro
+    networks:
+      - app-network
+      # NOT cowrie-network - backend only accesses logs via volume (per D-06, D-08)
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  # Cowrie honeypot (per D-14)
+  # Isolated on cowrie-network, logs shared via volume
+  cowrie:
+    image: cowrie/cowrie:latest
+    ports:
+      - "${COWRIE_SSH_PORT:-2222}:2222"
+      - "${COWRIE_TELNET_PORT:-2323}:2223"
+    volumes:
+      - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
+    networks:
+      - cowrie-network
+      # ONLY cowrie-network - isolated from app services (per D-05, D-06, D-08)
+    healthcheck:
+      test: ["CMD-SHELL", "pgrep cowrie && nc -z localhost 2222"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    # Official image runs as non-root 'cowrie' user by default (per D-17)
+
+# Networks (per D-05)
+networks:
+  app-network:
+    driver: bridge
+  cowrie-network:
+    driver: bridge
+    internal: true  # No external internet access from Cowrie (per D-08)
+
+# Volumes
+volumes:
+  frontend-static:  # Static files for nginx to serve
+  cowrie-logs:      # Shared logs between Cowrie and backend (per D-03)
