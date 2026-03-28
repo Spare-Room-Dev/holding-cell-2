@@ -78,7 +78,10 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
   4. Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
   5. No hardcoded secrets; all sensitive config via environment files
   6. Cowrie network isolated from app network (honeypot cannot reach backend/frontend)
-**Plans**: TBD
+**Plans**: 3 plans (Wave 1: 08-01, 08-03 | Wave 2: 08-02)
+- [ ] 08-01-PLAN.md — Create nginx.prod.conf with SSL termination, docker-compose.prod.yml, certbot systemd timer (SEC-02, SEC-03, SEC-05)
+- [ ] 08-02-PLAN.md — Add HTTP Basic Auth to nginx, create htpasswd setup script, update .env.example (SEC-01, SEC-05)
+- [ ] 08-03-PLAN.md — Create UFW firewall script, verify network isolation, create deployment documentation (SEC-04, SEC-06)
 
 ## Progress
 
@@ -91,7 +94,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 | 5. Docker Containerization | 2/2 | Complete | 2026-03-26 |
 | 6. Cowrie Integration | 3/3 | Complete | 2026-03-26 |
 | 7. Persistence Layer | 0/2 | Not started | - |
-| 8. VPS Deployment & Security | 0/3 | Not started | - |
+| 8. VPS Deployment & Security | 0/3 | Planned | - |
 
 ---
 
@@ -100,5 +103,6 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 *Phase 5 planned: 2026-03-26*
 *Phase 6 planned: 2026-03-26*
 *Phase 7 planned: 2026-03-26*
+*Phase 8 planned: 2026-03-28*
 *Granularity: coarse (4 phases per milestone)*
 *Coverage: 20/20 v1.1 requirements mapped*
