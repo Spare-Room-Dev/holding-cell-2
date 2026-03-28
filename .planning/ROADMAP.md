@@ -81,7 +81,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 **Plans**: 3 plans (Wave 1: 08-01, 08-03 | Wave 2: 08-02)
 - [x] 08-01-PLAN.md — Create nginx.prod.conf with SSL termination, docker-compose.prod.yml, certbot systemd timer (SEC-02, SEC-03, SEC-05)
 - [ ] 08-02-PLAN.md — Add HTTP Basic Auth to nginx, create htpasswd setup script, update .env.example (SEC-01, SEC-05)
-- [ ] 08-03-PLAN.md — Create UFW firewall script, verify network isolation, create deployment documentation (SEC-04, SEC-06)
+- [x] 08-03-PLAN.md — Create UFW firewall script, verify network isolation, create deployment documentation (SEC-04, SEC-06)
 
 ## Progress
 

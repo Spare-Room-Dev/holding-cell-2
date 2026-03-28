@@ -38,9 +38,9 @@
 - [ ] **SEC-01**: Dashboard protected with authentication (password protection or IP whitelist)
 - [x] **SEC-02**: HTTPS via Let's Encrypt with auto-renewal
 - [x] **SEC-03**: Nginx WebSocket configuration prevents 60-second disconnects
-- [ ] **SEC-04**: Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
+- [x] **SEC-04**: Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
 - [x] **SEC-05**: No hardcoded secrets; environment files for sensitive configuration
-- [ ] **SEC-06**: Cowrie network isolated from app network (no cross-talk between honeypot and dashboard)
+- [x] **SEC-06**: Cowrie network isolated from app network (no cross-talk between honeypot and dashboard)
 
 ### v1.1 Traceability
 
@@ -64,9 +64,9 @@
 | SEC-01 | Phase 8 | Pending |
 | SEC-02 | Phase 8 | Complete |
 | SEC-03 | Phase 8 | Complete |
-| SEC-04 | Phase 8 | Pending |
+| SEC-04 | Phase 8 | Complete |
 | SEC-05 | Phase 8 | Complete |
-| SEC-06 | Phase 8 | Pending |
+| SEC-06 | Phase 8 | Complete |
 
 **v1.1 Coverage:**
 - v1.1 requirements: 20 total
