@@ -35,7 +35,7 @@
 
 ### VPS Deployment & Security
 
-- [ ] **SEC-01**: Dashboard protected with authentication (password protection or IP whitelist)
+- [x] **SEC-01**: Dashboard protected with authentication (password protection or IP whitelist)
 - [x] **SEC-02**: HTTPS via Let's Encrypt with auto-renewal
 - [x] **SEC-03**: Nginx WebSocket configuration prevents 60-second disconnects
 - [x] **SEC-04**: Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
@@ -61,7 +61,7 @@
 | DEPLOY-02 | Phase 5 | Complete |
 | DEPLOY-03 | Phase 5 | Complete |
 | DEPLOY-04 | Phase 5 | Complete |
-| SEC-01 | Phase 8 | Pending |
+| SEC-01 | Phase 8 | Complete |
 | SEC-02 | Phase 8 | Complete |
 | SEC-03 | Phase 8 | Complete |
 | SEC-04 | Phase 8 | Complete |
