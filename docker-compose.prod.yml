@@ -11,5 +11,6 @@ services:
       - ./nginx/nginx.prod.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/certbot:/var/www/certbot:ro
+      - /etc/nginx/.htpasswd:/etc/nginx/.htpasswd:ro  # Per D-02: HTTP Basic Auth password file
     networks:
       - app-network
