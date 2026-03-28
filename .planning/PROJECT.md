@@ -50,14 +50,19 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 - **Typography:** Satoshi Bold (display) + DM Sans (body) + IBM Plex Mono (data)
 - **Dark mode primary** — Light mode available as toggle
 
-## Current Milestone: v1.1 Real Threats
+## Current Milestone: v1.0 Complete — Ready for Deployment
 
-**Goal:** Deploy The Holding Cell as a public-facing demo with live Cowrie honeypot data, accessible 24/7.
+**Goal:** All 8 phases complete. The Holding Cell is ready for VPS deployment with HTTPS, authentication, and firewall security.
 
-**Target features:**
-- Cowrie honeypot integration — capture real SSH/Telnet attacks
-- VPS deployment — run on existing server with domain
-- Docker Compose pipeline — reproducible containerized deployment
+**Completed:**
+- Phase 01: Foundation — FastAPI backend, Socket.io, fake attack generator
+- Phase 02: Core Visualization — JailCellGrid, pixel-art prisoners, stone cell
+- Phase 03: Animated Prisoners — Framer Motion entrance, shift spring physics
+- Phase 04: Polish — Responsive layout, dark/light mode, mobile bottom sheet
+- Phase 05: Docker Containerization — Multi-container setup, health checks
+- Phase 06: Cowrie Integration — Real honeypot data, watchfiles log monitoring
+- Phase 07: Persistence & Analytics — JSON persistence, attack history, analytics panel
+- Phase 08: VPS Deployment & Security — HTTPS, HTTP Basic Auth, UFW firewall, deployment docs
 
 ## Requirements
 
@@ -82,6 +87,10 @@ This is a **greenfield project**. The PLAN.md and DESIGN.md define Approach A (M
 - [x] Polish: Responsive layout (mobile/tablet/desktop), light/dark mode toggle, mobile bottom sheet — Validated in Phase 04
 - [x] Polish: All 5 archetype classifications working per BACK-08 fingerprint rules — Validated in Phase 04
 - [x] Polish: Demo-ready MVP with number formatting (commas, 99,999+ cap) — Validated in Phase 04
+- [x] Docker: Multi-container orchestration with health checks — Validated in Phase 05
+- [x] Cowrie: Real honeypot integration with log monitoring — Validated in Phase 06
+- [x] Persistence: JSON file storage with attack history — Validated in Phase 07
+- [x] Security: HTTPS, HTTP Basic Auth, UFW firewall — Validated in Phase 08
 
 ## Out of Scope
 
@@ -110,4 +119,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-03-26 — Milestone v1.1 Real Threats started*
+*Last updated: 2026-03-28 — Milestone v1.0 Complete — Ready for deployment*
