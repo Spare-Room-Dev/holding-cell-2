@@ -19,12 +19,12 @@
 
 ### Persistence & Analytics
 
-- [ ] **STORE-01**: Last 20 attacks stored persistently (survives server restart)
-- [ ] **STORE-02**: All visitors see the same attack history (shared state)
-- [ ] **STORE-03**: New visitors see existing attacks immediately on connect
-- [ ] **STAT-01**: Lifetime attack counter shows total attacks since deployment
-- [ ] **STAT-02**: Top attacking locations displayed (countries by attack count)
-- [ ] **STAT-03**: Top attack methods displayed (SSH vs Telnet, ports targeted)
+- [x] **STORE-01**: Last 20 attacks stored persistently (survives server restart)
+- [x] **STORE-02**: All visitors see the same attack history (shared state)
+- [x] **STORE-03**: New visitors see existing attacks immediately on connect
+- [x] **STAT-01**: Lifetime attack counter shows total attacks since deployment
+- [x] **STAT-02**: Top attacking locations displayed (countries by attack count)
+- [x] **STAT-03**: Top attack methods displayed (SSH vs Telnet, ports targeted)
 
 ### Docker Containerization
 
@@ -36,10 +36,10 @@
 ### VPS Deployment & Security
 
 - [ ] **SEC-01**: Dashboard protected with authentication (password protection or IP whitelist)
-- [ ] **SEC-02**: HTTPS via Let's Encrypt with auto-renewal
-- [ ] **SEC-03**: Nginx WebSocket configuration prevents 60-second disconnects
+- [x] **SEC-02**: HTTPS via Let's Encrypt with auto-renewal
+- [x] **SEC-03**: Nginx WebSocket configuration prevents 60-second disconnects
 - [ ] **SEC-04**: Firewall exposes only: honeypot ports (22, 23), HTTPS (443), admin SSH (alternate port)
-- [ ] **SEC-05**: No hardcoded secrets; environment files for sensitive configuration
+- [x] **SEC-05**: No hardcoded secrets; environment files for sensitive configuration
 - [ ] **SEC-06**: Cowrie network isolated from app network (no cross-talk between honeypot and dashboard)
 
 ### v1.1 Traceability
@@ -51,21 +51,21 @@
 | COW-03 | Phase 6 | Complete |
 | COW-04 | Phase 6 | Complete |
 | COW-05 | Phase 6 | Complete |
-| STORE-01 | Phase 7 | Pending |
-| STORE-02 | Phase 7 | Pending |
-| STORE-03 | Phase 7 | Pending |
-| STAT-01 | Phase 7 | Pending |
-| STAT-02 | Phase 7 | Pending |
-| STAT-03 | Phase 7 | Pending |
+| STORE-01 | Phase 7 | Complete |
+| STORE-02 | Phase 7 | Complete |
+| STORE-03 | Phase 7 | Complete |
+| STAT-01 | Phase 7 | Complete |
+| STAT-02 | Phase 7 | Complete |
+| STAT-03 | Phase 7 | Complete |
 | DEPLOY-01 | Phase 5 | Complete |
 | DEPLOY-02 | Phase 5 | Complete |
 | DEPLOY-03 | Phase 5 | Complete |
 | DEPLOY-04 | Phase 5 | Complete |
 | SEC-01 | Phase 8 | Pending |
-| SEC-02 | Phase 8 | Pending |
-| SEC-03 | Phase 8 | Pending |
+| SEC-02 | Phase 8 | Complete |
+| SEC-03 | Phase 8 | Complete |
 | SEC-04 | Phase 8 | Pending |
-| SEC-05 | Phase 8 | Pending |
+| SEC-05 | Phase 8 | Complete |
 | SEC-06 | Phase 8 | Pending |
 
 **v1.1 Coverage:**
