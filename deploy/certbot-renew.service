@@ -1,0 +1,14 @@
+[Unit]
+Description=Let's Encrypt certificate renewal for The Holding Cell
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+# Stop nginx to free port 80, renew certificates, start nginx
+ExecStart=/usr/bin/docker compose -f /opt/holding-cell/docker-compose.yml -f /opt/holding-cell/docker-compose.prod.yml stop nginx
+ExecStart=/usr/bin/certbot renew --quiet --standalone
+ExecStart=/usr/bin/docker compose -f /opt/holding-cell/docker-compose.yml -f /opt/holding-cell/docker-compose.prod.yml start nginx
+
+[Install]
+WantedBy=multi-user.target
