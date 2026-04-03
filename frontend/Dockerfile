@@ -26,8 +26,12 @@ FROM nginx:alpine AS production
 # Copy static files from builder stage
 COPY --from=builder /app/out /usr/share/nginx/html
 
+# Copy entrypoint script
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+RUN chmod +x /docker-entrypoint.sh
+
 # Expose port 80 for nginx
 EXPOSE 80
 
-# Start nginx in foreground
-CMD ["nginx", "-g", "daemon off;"]
+# Start via entrypoint to copy files to volume
+ENTRYPOINT ["/docker-entrypoint.sh"]

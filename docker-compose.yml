@@ -29,7 +29,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - frontend-static:/usr/share/nginx/html
+      - frontend-static:/static
     networks:
       - app-network
     restart: unless-stopped
