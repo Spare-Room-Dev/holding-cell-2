@@ -66,8 +66,8 @@ services:
   cowrie:
     image: cowrie/cowrie:latest
     ports:
-      - "${COWRIE_SSH_PORT:-2222}:2222"
-      - "${COWRIE_TELNET_PORT:-2323}:2223"
+      - "2222:2222/tcp"
+      - "2323:2223/tcp"
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
     networks:
