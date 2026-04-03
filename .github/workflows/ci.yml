@@ -13,9 +13,6 @@ jobs:
   frontend:
     name: Frontend CI
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
 
     steps:
       - name: Checkout code
@@ -26,22 +23,21 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: frontend/package-lock.json
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=optional
 
       - name: Security audit
-        run: npm audit --audit-level=moderate
+        run: npm audit --audit-level=moderate --workspace=frontend
 
       - name: Lint
-        run: npm run lint
+        run: npm run lint --workspace=frontend
 
       - name: Type check
-        run: npm run type-check
+        run: npm run type-check --workspace=frontend
 
       - name: Build
-        run: npm run build
+        run: npm run build --workspace=frontend
 
   backend:
     name: Backend CI
