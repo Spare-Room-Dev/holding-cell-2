@@ -28,6 +28,13 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+firebase-debug.log
 
 # Docker
 docker-compose.override.yml
+
+# Development tooling (not needed in repo)
+.claude/
+.planning/
+.gstack/
+PLAN.md
