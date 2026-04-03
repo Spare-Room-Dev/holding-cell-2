@@ -69,9 +69,7 @@ services:
       - "23:2223"
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
-    networks:
-      - cowrie-network
-      # ONLY cowrie-network - isolated from app services (per D-05, D-06, D-08)
+    network_mode: bridge
     restart: unless-stopped
     # Official image runs as non-root 'cowrie' user by default (per D-17)
 
