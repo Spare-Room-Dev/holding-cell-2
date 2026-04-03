@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package files for dependency installation
 COPY package.json package-lock.json* ./
 
-# Install dependencies (npm ci for clean install)
-RUN npm ci
+# Install dependencies (npm install works without lock file in workspace subdirectory)
+RUN npm install
 
 # Copy application source
 COPY . .
