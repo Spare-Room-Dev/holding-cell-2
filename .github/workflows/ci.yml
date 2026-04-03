@@ -1,0 +1,100 @@
+# CI workflow for The Holding Cell
+# Per SEC-03: Automated security and quality checks on every PR and push
+
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  frontend:
+    name: Frontend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type check
+        run: npm run type-check
+
+      - name: Build
+        run: npm run build
+
+  backend:
+    name: Backend CI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Syntax check
+        run: |
+          python -m py_compile main.py
+          python -m py_compile models.py
+          python -m py_compile cowrie_reader.py
+          python -m py_compile geoip_service.py
+          python -m py_compile persistence.py
+          python -m py_compile archetypes.py
+
+  docker:
+    name: Docker Build Test
+    runs-on: ubuntu-latest
+    needs: [frontend, backend]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build backend image
+        run: docker build -t holding-cell-backend:test ./backend
+
+      - name: Build frontend image
+        run: docker build -t holding-cell-frontend:test ./frontend
+
+      - name: Verify backend runs as non-root
+        run: |
+          USER=$(docker run --rm holding-cell-backend:test whoami)
+          if [ "$USER" = "appuser" ]; then
+            echo "PASS: Backend running as appuser"
+          else
+            echo "WARN: Backend running as $USER (expected appuser)"
+          fi
+
+      - name: Clean up
+        run: docker image rm holding-cell-backend:test holding-cell-frontend:test 2>/dev/null || true

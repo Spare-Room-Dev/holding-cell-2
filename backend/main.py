@@ -5,9 +5,11 @@ Per BACK-01: FastAPI server runs on port 8000 with async support
 Per BACK-02: python-socketio AsyncServer handles WebSocket connections
 Per D-07: CowrieReader processes real attacks from Cowrie honeypot
 Per D-09: Socket emit failures logged with try/catch, no crash
+Per SEC-02: WebSocket authentication token validation
 """
 
 import asyncio
+import os
 import socketio
 from fastapi import FastAPI
 import uvicorn
@@ -16,6 +18,9 @@ from cowrie_reader import CowrieReader
 from geoip_service import GeoIPService
 from persistence import PersistenceManager
 
+
+# Per SEC-02: WebSocket authentication token from environment
+WEBSOCKET_AUTH_TOKEN = os.environ.get('WEBSOCKET_AUTH_TOKEN', '')
 
 # Per BACK-01: FastAPI app initialization
 app = FastAPI(
@@ -60,18 +65,32 @@ combined_app = socketio.ASGIApp(sio, app)
 
 # Socket.IO event handlers
 @sio.event
-async def connect(sid: str, environ: dict, auth: dict) -> None:
+async def connect(sid: str, environ: dict, auth: dict) -> bool:
     """
     Handle client connection.
 
     Per D-05: Send history on connect.
     Per STORE-03: New clients immediately see existing attacks on connect.
+    Per SEC-02: Validate authentication token before allowing connection.
 
     Args:
         sid: Socket.io session ID
         environ: WSGI environment dict
         auth: Authentication data from client
+
+    Returns:
+        bool: True to accept connection, False to reject
     """
+    # Per SEC-02: Validate auth token if configured
+    if WEBSOCKET_AUTH_TOKEN:
+        if not auth:
+            print(f"[Socket.IO] Rejected connection from {sid}: no auth provided")
+            return False
+        token = auth.get('token', '')
+        if token != WEBSOCKET_AUTH_TOKEN:
+            print(f"[Socket.IO] Rejected connection from {sid}: invalid token")
+            return False
+
     print(f"[Socket.IO] Client connected: {sid}")
 
     # Per D-05/D-06/D-07: Send history on connect
@@ -82,6 +101,8 @@ async def connect(sid: str, environ: dict, auth: dict) -> None:
             'lifetime_count': persistence_manager.get_lifetime_count(),
             'analytics': persistence_manager.get_analytics()
         }, to=sid)
+
+    return True  # Explicitly return True to accept connection
 
 
 @sio.event
