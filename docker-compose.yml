@@ -64,23 +64,15 @@ services:
   # Cowrie honeypot (per D-14)
   # Isolated on cowrie-network, logs shared via volume
   cowrie:
-    image: cowrie/cowrie:v2.9.15
+    image: cowrie/cowrie:latest
     ports:
       - "${COWRIE_SSH_PORT:-2222}:2222"
       - "${COWRIE_TELNET_PORT:-2323}:2223"
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
-      - ./cowrie-config/userdb.txt:/cowrie/cowrie-git/etc/userdb.txt:ro
-      - ./cowrie-config/honeyfs:/cowrie/cowrie-git/honeyfs:ro
     networks:
       - cowrie-network
       # ONLY cowrie-network - isolated from app services (per D-05, D-06, D-08)
-    healthcheck:
-      test: ["CMD-SHELL", "pgrep cowrie && nc -z localhost 2222"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 60s
     restart: unless-stopped
     # Official image runs as non-root 'cowrie' user by default (per D-17)
 
