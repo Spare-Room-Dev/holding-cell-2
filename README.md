@@ -238,6 +238,8 @@ sudo certbot renew --standalone
 - **WebSocket auth token** must match between frontend and backend
 - **HTTP Basic Auth** protects the dashboard in production
 
+> **⚠️ Honeypot Warning:** This project intentionally exposes SSH (port 22) and Telnet (port 23) to the internet to attract attackers. Only deploy on a dedicated VPS or isolated network. The honeypot will receive malicious traffic - ensure your hosting provider allows this use case.
+
 ## License
 
 MIT
