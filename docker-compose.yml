@@ -63,17 +63,14 @@ services:
 
   # Cowrie honeypot (per D-14)
   # Isolated on cowrie-network, logs shared via volume
+  # Per SEC-04: Binds to standard SSH port 22 for realistic honeypot
   cowrie:
     image: cowrie/cowrie:latest
     ports:
-      - target: 2222
-        published: 2222
-        protocol: tcp
-        mode: host
-      - target: 2223
-        published: 2323
-        protocol: tcp
-        mode: host
+      - "22:2222"
+      - "23:2223"
+    cap_add:
+      - CAP_NET_BIND_SERVICE  # Required for privileged ports < 1024
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
     networks:
