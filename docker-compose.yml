@@ -64,7 +64,7 @@ services:
   # Cowrie honeypot (per D-14)
   # Isolated on cowrie-network, logs shared via volume
   cowrie:
-    image: cowrie/cowrie:latest
+    image: cowrie/cowrie:v2.9.15
     ports:
       - "${COWRIE_SSH_PORT:-2222}:2222"
       - "${COWRIE_TELNET_PORT:-2323}:2223"
