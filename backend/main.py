@@ -29,13 +29,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Per BACK-02: python-socketio AsyncServer with CORS for localhost:3000
-# Per D-04: CORS allows localhost:3000 only (development)
+# Per BACK-02: python-socketio AsyncServer with CORS
+# Per D-04: CORS allows configured origins from environment
 # Note: cors_credentials=True required for WebSocket-only transport
 # Note: Using callable for cors_allowed_origins because list-based validation
 # doesn't work correctly with WebSocket-only transport in python-engineio.
 # See: https://github.com/miguelgrinberg/python-socketio/discussions/1247
-ALLOWED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+ALLOWED_ORIGINS = os.environ.get('ALLOWED_ORIGINS', 'http://localhost:3000,http://127.0.0.1:3000').split(',')
 
 # Per D-20/D-21: GeoIP service for country lookups
 # Per D-07: CowrieReader replaces attack_generator

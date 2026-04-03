@@ -45,6 +45,7 @@ services:
       - COWRIE_LOG_PATH=${COWRIE_LOG_PATH:-/var/log/cowrie}
       - GEOIP_DB_PATH=${GEOIP_DB_PATH:-/geoip/GeoLite2-Country.mmdb}
       - WEBSOCKET_AUTH_TOKEN=${WEBSOCKET_AUTH_TOKEN:-}  # Per SEC-02: WebSocket authentication
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}  # Per D-04: CORS origins
     volumes:
       - cowrie-logs:${COWRIE_LOG_PATH:-/var/log/cowrie}:ro
       - ./geoip:/geoip:ro
