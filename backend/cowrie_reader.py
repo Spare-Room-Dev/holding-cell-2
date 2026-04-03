@@ -194,7 +194,9 @@ class CowrieReader:
             # Per D-09: Session complete - emit attack
             if session_id in self.sessions:
                 session_data = self.sessions.pop(session_id)
-                session_data.duration = event.get("duration", 0.0)
+                # Ensure duration is a float (Cowrie may send it as string)
+                duration_val = event.get("duration", 0.0)
+                session_data.duration = float(duration_val) if duration_val else 0.0
 
                 attack = await self._create_attack_event(session_data)
                 if attack:
