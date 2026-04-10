@@ -9,6 +9,7 @@ Per SEC-02: WebSocket authentication token validation
 """
 
 import asyncio
+import hmac
 import os
 import socketio
 from fastapi import FastAPI
@@ -87,7 +88,7 @@ async def connect(sid: str, environ: dict, auth: dict) -> bool:
             print(f"[Socket.IO] Rejected connection from {sid}: no auth provided")
             return False
         token = auth.get('token', '')
-        if token != WEBSOCKET_AUTH_TOKEN:
+        if not hmac.compare_digest(token, WEBSOCKET_AUTH_TOKEN):
             print(f"[Socket.IO] Rejected connection from {sid}: invalid token")
             return False
 
@@ -177,6 +178,14 @@ async def health_check() -> dict:
 async def startup() -> None:
     """Start server with persistence and Cowrie log watcher."""
     global persistence_manager
+
+    # Per SEC-02: Warn if WebSocket auth is disabled
+    if not WEBSOCKET_AUTH_TOKEN:
+        print("=" * 60)
+        print("WARNING: WEBSOCKET_AUTH_TOKEN is not set!")
+        print("WebSocket connections will be accepted without authentication.")
+        print("Set WEBSOCKET_AUTH_TOKEN in production for security.")
+        print("=" * 60)
 
     # Per D-07: Load history from JSON file into memory on startup
     persistence_manager = PersistenceManager()

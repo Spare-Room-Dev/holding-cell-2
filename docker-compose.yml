@@ -63,13 +63,14 @@ services:
   # Isolated on cowrie-network, logs shared via volume
   # Per SEC-04: Binds to standard SSH port 22 for realistic honeypot
   cowrie:
-    image: cowrie/cowrie:latest
+    image: cowrie/cowrie:2.9.15  # Pin version; update periodically
     ports:
       - "22:2222"
       - "23:2223"
     volumes:
       - cowrie-logs:/cowrie/cowrie-git/var/log/cowrie
-    network_mode: bridge
+    networks:
+      - cowrie-network
     restart: unless-stopped
     # Official image runs as non-root 'cowrie' user by default (per D-17)
 
