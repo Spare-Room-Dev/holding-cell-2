@@ -2,7 +2,6 @@
   "name": "holding-cell",
   "version": "0.1.0",
   "private": true,
-  "workspaces": ["frontend"],
   "scripts": {
     "dev:backend": "cd backend && uvicorn main:combined_app --reload --port 8000",
     "dev:frontend": "cd frontend && npm run dev",

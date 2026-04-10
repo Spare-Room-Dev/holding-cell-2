@@ -136,6 +136,12 @@ async def cowrie_emitter() -> None:
     global cowrie_reader
     cowrie_reader = CowrieReader(geoip_service=geoip_service)
 
+    # Skip processing if log directory doesn't exist (local dev)
+    if not os.path.isdir(cowrie_reader.log_dir):
+        print(f"[CowrieEmitter] Log directory not found: {cowrie_reader.log_dir}. "
+              "Skipping (expected in production only).")
+        return
+
     # Process existing log entries first
     await cowrie_reader.process_existing_log()
 

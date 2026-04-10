@@ -115,6 +115,10 @@ class CowrieReader:
         """
         self._emit_callback = emit_callback
 
+        if not os.path.isdir(self.log_dir):
+            print(f"[CowrieReader] Log directory not found: {self.log_dir}. Skipping watcher (expected in production only).")
+            return
+
         print(f"[CowrieReader] Starting watch on: {self.log_dir}")
 
         # Per RESEARCH.md: Watch directory (not file) to handle log rotation
