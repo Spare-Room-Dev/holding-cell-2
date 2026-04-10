@@ -112,7 +112,7 @@ A gamified SOC/threat intelligence visualization dashboard that renders honeypot
 
 Plans:
 - [x] 09-01-PLAN.md — Data layer: extract shared constants, add CountryPrisoner type, create useCountryPrisoners hook
-- [ ] 09-02-PLAN.md — Visualization: CountryTooltip, CountrySlot, PrisonerSprite flag variant, JailCellGrid refactor
+- [x] 09-02-PLAN.md — Visualization: CountryTooltip, CountrySlot, PrisonerSprite flag variant, JailCellGrid refactor
 ---
 
 *Roadmap created: 2026-03-24*
