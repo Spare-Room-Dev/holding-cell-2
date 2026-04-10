@@ -1,15 +1,18 @@
 // frontend/src/components/PrisonerSprite.tsx
 /**
  * PrisonerSprite - Pixel-art prisoner sprites as inline SVG
- * Phase 3: Animated Prisoners
+ * Phase 3: Animated Prisoners, Phase 9: Country-based Attack Aggregation
  *
- * Renders a 32x32 pixel-art SVG scaled to 56x56 display.
+ * Renders a 32x32 pixel-art SVG scaled to display.
  * Bandana color matches archetype for visual identification.
+ * When countryCode is provided, flag emoji replaces bandana as primary identifier.
+ * Per D-02: Country flag replaces bandana color when countryCode is set.
  * Per D-14: Inline SVG sprites (no external image files).
  * Per D-15: Bandana colors match ARCHETYPE_COLORS mapping.
  */
 
 import type { Archetype } from '@/types/attack';
+import { countryCodeToFlag } from '@/utils/countryToFlag';
 
 // Bandana colors mapping (hex values for direct SVG use)
 const BANDANA_COLORS: Record<Archetype, string> = {
@@ -22,24 +25,32 @@ const BANDANA_COLORS: Record<Archetype, string> = {
 
 interface PrisonerSpriteProps {
   archetype: Archetype;
+  countryCode?: string;
   className?: string;
 }
 
-export function PrisonerSprite({ archetype, className }: PrisonerSpriteProps) {
+export function PrisonerSprite({ archetype, countryCode, className }: PrisonerSpriteProps) {
   const bandanaColor = BANDANA_COLORS[archetype];
+  const showFlag = !!countryCode;
 
   return (
-    <div className={`w-14 h-14 flex items-center justify-center ${className || ''}`}>
+    <div className={`w-14 h-14 flex flex-col items-center justify-center ${className || ''}`}>
+      {/* Country flag above sprite (replaces bandana as primary identifier) */}
+      {showFlag && (
+        <span className="w-6 text-center inline-block text-base leading-none -mb-1">
+          {countryCodeToFlag(countryCode!)}
+        </span>
+      )}
       <svg
         viewBox="0 0 32 32"
-        width="56"
-        height="56"
+        width={showFlag ? 48 : 56}
+        height={showFlag ? 48 : 56}
         style={{ imageRendering: 'pixelated' }}
         className="pixel-sprite"
-        aria-label={`${archetype.replace('_', ' ')} prisoner`}
+        aria-label={showFlag ? `prisoner from ${countryCode}` : `${archetype.replace('_', ' ')} prisoner`}
       >
-        {/* Bandana - colored by archetype */}
-        <rect x="10" y="4" width="12" height="4" fill={bandanaColor} />
+        {/* Bandana - gray when flag shown, archetype color otherwise */}
+        <rect x="10" y="4" width="12" height="4" fill={showFlag ? '#444444' : bandanaColor} />
 
         {/* Head - white/gray */}
         <rect x="10" y="6" width="12" height="10" fill="#F0F0F0" />
