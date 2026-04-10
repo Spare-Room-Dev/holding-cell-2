@@ -1,43 +1,37 @@
 // frontend/src/components/JailCellGrid.tsx
 /**
- * JailCellGrid - Jail cell visualization with prisoners
- * Phase 2: Core Visualization, Phase 3: Animated Prisoners
+ * JailCellGrid - Jail cell visualization with country-based prisoners
+ * Phase 2: Core Visualization, Phase 3: Animated Prisoners,
+ * Phase 9: Country-based Attack Aggregation
  *
- * Displays up to 20 prisoners in a stone-textured cell with iron bar overlay.
- * Prisoners stack from bottom, newest on top (LIFO order).
+ * Displays up to 20 country prisoners in a stone-textured cell with iron bar overlay.
+ * Countries sorted by attack count descending; least-attacked drop off via AnimatePresence exit.
  * Empty state shows "The cell is empty. Waiting for attackers..." with CRT effect.
  *
- * Per D-04: CSS-only stone/brick texture (cell-texture class)
- * Per D-05: Iron bar overlay via CSS (cell-bars class)
- * Per D-07: Fixed 20-slot visual
- * Per D-08: Fade-out when count exceeds 20
- * Per D-09: LIFO order (newest at top)
- * Per D-13: Empty state with pixel font aesthetic
- * Per D-14: CRT scanline overlay on empty state
- * Per D-17: Layout prop enables FLIP animation when prisoners shift
+ * Per D-01: One slot per country (not per attack).
+ * Per D-03: 20-country cap (least-attacked countries drop off).
+ * Per D-08: FLIP animation via layout prop for smooth reordering.
+ * Per D-10: Data derived on frontend from useCountryPrisoners hook.
  */
 
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSocket } from '@/context/SocketContext';
-import { PrisonerSlot } from './PrisonerSlot';
+import { useCountryPrisoners } from '@/hooks/useCountryPrisoners';
+import { CountrySlot } from './CountrySlot';
 
 export function JailCellGrid() {
   const { state } = useSocket();
-  const attacks = state.attacks;
-
-  // Show last 20 attacks, newest first (LIFO - per D-09)
-  // Attacks array is already newest first from SocketContext
-  const visibleAttacks = attacks.slice(0, 20);
+  const countryPrisoners = useCountryPrisoners(state.attacks);
 
   return (
     <div className="relative h-full cell-texture rounded-lg overflow-hidden">
-      {/* Iron bar overlay (per D-05) */}
+      {/* Iron bar overlay */}
       <div className="absolute inset-0 cell-bars" />
 
-      {/* Empty state (per D-13, D-14) */}
-      {visibleAttacks.length === 0 && (
+      {/* Empty state */}
+      {countryPrisoners.length === 0 && (
         <div className="absolute inset-0 flex items-center justify-center crt-scanlines">
           <p className="font-mono text-text-muted text-center px-lg">
             The cell is empty.
@@ -47,19 +41,19 @@ export function JailCellGrid() {
         </div>
       )}
 
-      {/* Prisoner stack - flex-col-reverse stacks from bottom (per D-03) */}
-      <div className="absolute inset-0 flex flex-col-reverse gap-sm p-md overflow-hidden">
+      {/* Country prisoner grid - responsive auto-fill layout */}
+      <div className="absolute inset-0 grid grid-cols-[repeat(auto-fill,minmax(3.5rem,1fr))] gap-sm p-md overflow-auto content-start">
         <AnimatePresence mode="popLayout">
-          {visibleAttacks.map((attack, index) => (
+          {countryPrisoners.map((country) => (
             <motion.div
-              key={attack.id}
+              key={country.countryCode}
               layout
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25, ease: 'easeOut' }}
             >
-              <PrisonerSlot attack={attack} isNew={index === 0} />
+              <CountrySlot country={country} />
             </motion.div>
           ))}
         </AnimatePresence>
