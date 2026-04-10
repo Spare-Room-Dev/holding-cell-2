@@ -1,35 +1,10 @@
 'use client';
 
 import { countryCodeToFlag } from '@/utils/countryToFlag';
+import { COUNTRY_NAMES, getCountryName } from '@/utils/countryNames';
 
 interface CountryListProps {
   countries: [string, number][];  // [countryCode, count] pairs, already sorted
-}
-
-// Country code to name lookup (ISO 3166-1) - common countries only
-const COUNTRY_NAMES: Record<string, string> = {
-  CN: 'China',
-  RU: 'Russia',
-  US: 'United States',
-  BR: 'Brazil',
-  IR: 'Iran',
-  IN: 'India',
-  KR: 'South Korea',
-  VN: 'Vietnam',
-  ID: 'Indonesia',
-  TR: 'Turkey',
-  TW: 'Taiwan',
-  JP: 'Japan',
-  DE: 'Germany',
-  GB: 'United Kingdom',
-  FR: 'France',
-  NL: 'Netherlands',
-  UA: 'Ukraine',
-  // Add more as needed
-};
-
-function getCountryName(code: string): string {
-  return COUNTRY_NAMES[code] || code;
 }
 
 export function CountryList({ countries }: CountryListProps) {

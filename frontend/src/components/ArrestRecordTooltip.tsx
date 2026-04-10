@@ -9,6 +9,8 @@
  */
 
 import type { AttackEvent } from '@/types/attack';
+import { countryCodeToFlag } from '@/utils/countryToFlag';
+import { ARCHETYPE_LABELS, ARCHETYPE_COLORS } from '@/utils/archetypes';
 
 /**
  * Convert ISO timestamp to relative time string
@@ -49,41 +51,6 @@ function formatDuration(seconds: number): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-/**
- * Convert country code to flag emoji
- * Uses the formula: regional indicator symbols = 127397 + charCode
- */
-function countryCodeToFlag(countryCode: string): string {
-  if (!countryCode || countryCode.length !== 2) {
-    return '';
-  }
-
-  try {
-    return String.fromCodePoint(
-      ...countryCode.toUpperCase().split('').map((c) => 127397 + c.charCodeAt(0))
-    );
-  } catch {
-    return '';
-  }
-}
-
-// Archetype display labels (uppercase for badge)
-const ARCHETYPE_LABELS: Record<string, string> = {
-  script_kiddie: 'SCRIPT KIDDIE',
-  botnet_drone: 'BOTNET DRONE',
-  apt_operative: 'APT OPERATIVE',
-  iot_worm: 'IOT WORM',
-  hacktivist: 'HACKTIVIST',
-};
-
-// Archetype colors matching ARCHETYPE_COLORS pattern
-const ARCHETYPE_COLORS: Record<string, string> = {
-  script_kiddie: '#FFB800',
-  botnet_drone: '#00FF88',
-  apt_operative: '#FF3B5C',
-  iot_worm: '#A855F7',
-  hacktivist: '#60A5FA',
-};
 
 interface ArrestRecordTooltipProps {
   attack: AttackEvent;

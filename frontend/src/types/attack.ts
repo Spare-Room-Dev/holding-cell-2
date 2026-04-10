@@ -47,3 +47,20 @@ export interface AttackHistoryPayload {
   lifetime_count: number;
   analytics: Analytics;
 }
+
+export interface CountryPrisoner {
+  /** ISO 3166-1 alpha-2 country code (e.g., "CN") */
+  countryCode: string;
+  /** Human-readable country name (e.g., "China") */
+  countryName: string;
+  /** Total number of attacks from this country */
+  count: number;
+  /** Breakdown of attacks by archetype */
+  archetypes: Partial<Record<Archetype, number>>;
+  /** ISO 8601 timestamp of most recent attack */
+  lastAttack: string;
+  /** True only on the render where this country first appears */
+  isNew: boolean;
+  /** True when count increased and previous count was > 0 (not on first appearance) */
+  isUpdated: boolean;
+}
